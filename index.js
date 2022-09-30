@@ -7,8 +7,8 @@ const io = new Server(server);
 const redis = require("redis");
 const redisAdapter = require("@socket.io/redis-adapter");
 const port = process.env.PORT || 6000;
-const redisDbUrl = process.env.redisDbUrl;
-const redidDbPassword = process.env.redidDbPassword;
+const redisDbUrl = process.env.RedisDbUrl;
+const redidDbPassword = process.env.RedisDbPassword;
 
 io.on('connection', (socket) => {
     socket.emit('helloo', () => {
