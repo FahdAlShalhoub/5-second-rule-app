@@ -11,9 +11,7 @@ const redisDbUrl = process.env.RedisDbUrl;
 const redidDbPassword = process.env.RedisDbPassword;
 
 io.on('connection', (socket) => {
-    socket.emit('helloo', () => {
-        console.log("لككلكلكلكلكلككلك مرحب الصبايا");
-    });
+    socket.emit('helloo', "لككلكلكلكلكلككلك مرحب الصبايا");
 });
 
 const pubClient = redis.createClient({
