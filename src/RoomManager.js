@@ -5,7 +5,7 @@ module.exports = {
         const room = {
             host,
             players: [],
-            roomId: faker.random.words(3).replaceAll(" ", "-")
+            roomId: faker.random.words(3).replace(new RegExp(" ", 'g'), "-")
         }
 
         repository.getActiveRoomByHostId(room.hostId)
