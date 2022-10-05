@@ -1,5 +1,6 @@
 const {faker} = require('@faker-js/faker');
 const ApiError = require("./Errors/ApiError");
+const HttpStatusCode = require("./HttpStatusCode");
 // const ApiError = require("./Errors/ApiError");
 
 module.exports = {
@@ -22,7 +23,7 @@ module.exports = {
 
         function ensureHostHasNoActiveRoom(existingRoom) {
             if (existingRoom) {
-                reject(new ApiError("Host Already Has Room"))
+                reject(new ApiError("Host Already Has Room", HttpStatusCode.BadRequest))
             }
         }
     }),
@@ -30,7 +31,7 @@ module.exports = {
     joinRoom: (player, roomId, repository) => new Promise((resolve, reject) => {
         repository.getActiveRoomById(roomId)
             .then(room => {
-                if(!room) reject(new ApiError("Room Does Not Exist"))
+                if(!room) reject(new ApiError("Room Does Not Exist", HttpStatusCode.BadRequest))
                 room.players.push(player)
                 return room;
             })

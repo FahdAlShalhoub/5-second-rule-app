@@ -59,8 +59,12 @@ describe("testJoinRoom", () => {
             })
             .catch(err => {
                 expect(err).to.be.instanceof(ApiError)
+                expect(err.statusCode).to.be.equal(400)
                 expect(err.message).equal("Room Does Not Exist")
                 done();
+            })
+            .catch(err => {
+                done(err)
             });
     });
 

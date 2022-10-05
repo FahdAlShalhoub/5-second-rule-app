@@ -53,6 +53,7 @@ describe("testGenerateRoom", () => {
             })
             .catch(err => {
                 expect(err).to.be.instanceof(ApiError)
+                expect(err.statusCode).to.be.equal(400)
                 expect(err.message).to.deep.equal("Host Already Has Room");
                 done()
             })
