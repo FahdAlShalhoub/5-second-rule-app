@@ -60,8 +60,7 @@ app.use(
     })
 );
 
-let rooms = [];
-const roomsRepository = require("./tests/InMemoryRepositories/InMemoryRoomRepository")(rooms);
+const roomsRepository = require("./tests/InMemoryRepositories/InMemoryRoomRepository")([]);
 
 app.post(RoomRoutes.CreateRoom, (req, res, next) => {
     RoomManager.generateRoom(req.body, roomsRepository)
