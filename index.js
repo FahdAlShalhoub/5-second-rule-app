@@ -6,14 +6,16 @@ const {Server} = require("socket.io");
 const io = new Server(server);
 const redis = require("redis");
 const redisAdapter = require("@socket.io/redis-adapter");
-const port = process.env.PORT || 6000;
-const redisDbUrl = process.env.RedisDbUrl;
-const redidDbPassword = process.env.RedisDbPassword;
+const port = process.env.PORT || 5100;
+const redisDbUrl = process.env.RedisDbUrl
+const redidDbPassword = process.env.RedisDbPassword
+const sentryDsn = process.env.SentryDsn
+const RoomRoutes = require("./src/Routes");
+const RoomManager = require("./src/RoomManager");
+const Sentry = require("@sentry/node");
+const Tracing = require("@sentry/tracing");
 
 io.on('connection', (socket) => {
-    console.log(socket.data)
-    socket.emit('helloo', "لككلكلكلكلكلككلك مرحب الصبايا");
-    socket.emit('helloo', "لككلكلكلكلكلككلك مرحب الصبايا مرتين");
     socket.on("helloo", (msg) => {
         console.log(msg)
     })
@@ -30,6 +32,50 @@ Promise.all([pubClient.connect(), subClient.connect()]).then(() => {
     io.listen(3000);
 });
 
+Sentry.init({
+    dsn: sentryDsn,
+    integrations: [
+        // enable HTTP calls tracing
+        new Sentry.Integrations.Http({ tracing: true }),
+        // enable Express.js middleware tracing
+        new Tracing.Integrations.Express({ app }),
+    ],
+
+    // Set tracesSampleRate to 1.0 to capture 100%
+    // of transactions for performance monitoring.
+    // We recommend adjusting this value in production
+    tracesSampleRate: 1.0,
+});
+
+app.use(express.json());
+
+app.use(Sentry.Handlers.requestHandler());
+app.use(Sentry.Handlers.tracingHandler());
+
+app.use(
+    Sentry.Handlers.errorHandler({
+        shouldHandleError(error) {
+            return error.status === 500;
+        }
+    })
+);
+
+app.use((err, req, res, next) => {
+    console.error(err.stack)
+    res.status(500).send(toProblemDetails(err, res))
+})
+
+const toProblemDetails = (err, res) => {
+    res.set("Content-Type", "application/problem+json")
+    res.set("Content-Language", "ar")
+    return {
+        type: "about:content",
+        title: err.message,
+        details: err.message,
+        instance: ""
+    }
+}
+
 server.listen(port, () => {
-    console.log('Server Started');
+    console.log(`Server Started At Port: ${port}`);
 });
