@@ -1,19 +1,20 @@
 const express = require('express');
-const app = express();
 const http = require('http');
-const server = http.createServer(app);
-const {Server} = require("socket.io");
-const io = new Server(server);
 const redis = require("redis");
 const redisAdapter = require("@socket.io/redis-adapter");
-const port = process.env.PORT || 5100;
-const redisDbUrl = process.env.RedisDbUrl
-const redidDbPassword = process.env.RedisDbPassword
-const sentryDsn = process.env.SentryDsn
 const RoomRoutes = require("./src/Routes");
 const RoomManager = require("./src/RoomManager");
 const Sentry = require("@sentry/node");
 const Tracing = require("@sentry/tracing");
+
+const app = express();
+const server = http.createServer(app);
+const {Server} = require("socket.io");
+const io = new Server(server);
+const port = process.env.PORT || 5100;
+const redisDbUrl = process.env.RedisDbUrl
+const redidDbPassword = process.env.RedisDbPassword
+const sentryDsn = process.env.SentryDsn
 
 io.on('connection', (socket) => {
     socket.on("helloo", (msg) => {
