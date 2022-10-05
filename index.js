@@ -7,9 +7,9 @@ const io = new Server(server);
 const redis = require("redis");
 const redisAdapter = require("@socket.io/redis-adapter");
 const port = process.env.PORT || 5100;
-const redisDbUrl = process.env.RedisDbUrl || "redis://redis-19686.c300.eu-central-1-1.ec2.cloud.redislabs.com:19686"
-const redidDbPassword = process.env.RedisDbPassword || "IxDujKfenxQkzoLqmigUGZ0aO2wrqPJD"
-const sentryDsn = process.env.SentryDsn || "https://2a88c3c69858463fb27e12ba268d817b@o4503932970467328.ingest.sentry.io/4503932977217536"
+const redisDbUrl = process.env.RedisDbUrl
+const redidDbPassword = process.env.RedisDbPassword
+const sentryDsn = process.env.SentryDsn
 const RoomRoutes = require("./src/Routes");
 const RoomManager = require("./src/RoomManager");
 const Sentry = require("@sentry/node");
@@ -52,7 +52,6 @@ app.use(Sentry.Handlers.requestHandler());
 app.use(Sentry.Handlers.tracingHandler());
 
 const roomsRepository = require("./tests/InMemoryRepositories/InMemoryRoomRepository")([]);
-
 app.post(RoomRoutes.CreateRoom, (req, res, next) => {
     RoomManager.generateRoom(req.body, roomsRepository)
         .then(response => res.send(response))
