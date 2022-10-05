@@ -1,6 +1,7 @@
 const expect = require('chai').expect;
 const RoomManager = require("../src/RoomManager");
 const RoomStatus = require("../src/RoomStatuses");
+const ApiError = require("../src/Errors/ApiError");
 
 describe("testGenerateRoom", () => {
     let rooms = [];
@@ -51,6 +52,7 @@ describe("testGenerateRoom", () => {
                 done(new Error("Saved Rooms With Same Host " + JSON.stringify(rooms)))
             })
             .catch(err => {
+                expect(err).to.be.instanceof(ApiError)
                 expect(err.message).to.deep.equal("Host Already Has Room");
                 done()
             })

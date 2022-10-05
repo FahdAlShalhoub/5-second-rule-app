@@ -2,6 +2,7 @@ const RoomManager = require("../src/RoomManager");
 const RoomStatuses = require("../src/RoomStatuses");
 const expect = require("chai").expect;
 const roomRepositoryFactory = require("./InMemoryRepositories/InMemoryRoomRepository");
+const ApiError = require("../src/Errors/ApiError");
 
 describe("testJoinRoom", () => {
     let rooms;
@@ -57,6 +58,7 @@ describe("testJoinRoom", () => {
                 done(new Error("Did Not Throw Error"));
             })
             .catch(err => {
+                expect(err).to.be.instanceof(ApiError)
                 expect(err.message).equal("Room Does Not Exist")
                 done();
             });
