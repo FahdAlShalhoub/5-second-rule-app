@@ -1,7 +1,7 @@
 const RoomManager = require("../src/RoomManager");
 const RoomStatuses = require("../src/RoomStatuses");
 const expect = require("chai").expect;
-const roomRepositoryFactory = require("./InMemoryRepsitories/InMemoryRoomRepository");
+const roomRepositoryFactory = require("./InMemoryRepositories/InMemoryRoomRepository");
 
 describe("testJoinRoom", () => {
     let rooms;
@@ -15,7 +15,7 @@ describe("testJoinRoom", () => {
             status: RoomStatuses.Active,
             players: []
         }];
-        roomsRepository = require("./InMemoryRepsitories/InMemoryRoomRepository")(rooms)
+        roomsRepository = require("./InMemoryRepositories/InMemoryRoomRepository")(rooms)
     })
 
     it('Should Return Joined Room Successfully', function (done) {

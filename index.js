@@ -60,14 +60,17 @@ app.use(
     })
 );
 
+let rooms = [];
+const roomsRepository = require("./tests/InMemoryRepositories/InMemoryRoomRepository")(rooms);
+
 app.post(RoomRoutes.CreateRoom, (req, res, next) => {
-    RoomManager.generateRoom(req.body)
+    RoomManager.generateRoom(req.body, roomsRepository)
         .then(response => res.send(JSON.stringify(response)))
         .catch(next)
 });
 
 app.post(RoomRoutes.JoinRoom, (req, res, next) => {
-    RoomManager.joinRoom(req.body, req.params.roomId)
+    RoomManager.joinRoom(req.body, req.params.roomId, roomsRepository)
         .then(response => res.send(JSON.stringify(response)))
         .catch(next)
 });

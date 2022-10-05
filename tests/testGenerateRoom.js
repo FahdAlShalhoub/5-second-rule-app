@@ -8,7 +8,7 @@ describe("testGenerateRoom", () => {
 
     beforeEach(() => {
         rooms = []
-        roomsRepository = require("./InMemoryRepsitories/InMemoryRoomRepository")(rooms)
+        roomsRepository = require("./InMemoryRepositories/InMemoryRoomRepository")(rooms)
     });
 
     it('Should Return New Room Successfully', function (done) {
