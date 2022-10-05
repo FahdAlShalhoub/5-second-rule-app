@@ -64,13 +64,13 @@ const roomsRepository = require("./tests/InMemoryRepositories/InMemoryRoomReposi
 
 app.post(RoomRoutes.CreateRoom, (req, res, next) => {
     RoomManager.generateRoom(req.body, roomsRepository)
-        .then(response => res.send(JSON.stringify(response)))
+        .then(res.send)
         .catch(next)
 });
 
 app.post(RoomRoutes.JoinRoom, (req, res, next) => {
     RoomManager.joinRoom(req.body, req.params.roomId, roomsRepository)
-        .then(response => res.send(JSON.stringify(response)))
+        .then(res.send)
         .catch(next)
 });
 
