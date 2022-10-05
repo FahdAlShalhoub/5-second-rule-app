@@ -28,10 +28,8 @@ module.exports = {
 
     joinRoom: (player, roomId, repository) => new Promise((resolve, reject) => {
         repository.getActiveRoomById(roomId)
-            .then((room) => {
-                if(!room) reject(new Error("Room Does Not Exist"))
-            })
             .then(room => {
+                if(!room) reject(new Error("Room Does Not Exist"))
                 room.players.push(player)
                 return room;
             })
