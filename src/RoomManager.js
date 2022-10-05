@@ -1,5 +1,5 @@
 const {faker} = require('@faker-js/faker');
-const ApiError = require("./Errors/ApiError");
+// const ApiError = require("./Errors/ApiError");
 
 module.exports = {
     generateRoom: (host, repository) => new Promise((resolve, reject) => {
@@ -21,7 +21,7 @@ module.exports = {
 
         function ensureHostHasNoActiveRoom(existingRoom) {
             if (existingRoom) {
-                reject(new ApiError("Host Already Has Room"))
+                reject(new Error("Host Already Has Room"))
             }
         }
     }),
