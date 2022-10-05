@@ -47,10 +47,9 @@ Sentry.init({
     tracesSampleRate: 1.0,
 });
 
-app.use(express.json());
-
 app.use(Sentry.Handlers.requestHandler());
 app.use(Sentry.Handlers.tracingHandler());
+app.use(express.json());
 
 const roomsRepository = require("./tests/InMemoryRepositories/InMemoryRoomRepository")([]);
 
@@ -84,7 +83,7 @@ const toProblemDetails = (err, res) => {
     res.set("Content-Type", "application/problem+json")
     res.set("Content-Language", "ar")
     return {
-        type: "about:content",
+        type: "about:blank",
         title: err.message,
         details: err.message,
         instance: ""
