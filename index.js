@@ -60,6 +60,18 @@ app.use(
     })
 );
 
+app.post(RoomRoutes.CreateRoom, (req, res, next) => {
+    RoomManager.generateRoom(req.body)
+        .then(response => res.send(JSON.stringify(response)))
+        .catch(next)
+});
+
+app.post(RoomRoutes.JoinRoom, (req, res, next) => {
+    RoomManager.joinRoom(req.body, req.params.roomId)
+        .then(response => res.send(JSON.stringify(response)))
+        .catch(next)
+});
+
 app.use((err, req, res, next) => {
     console.error(err.stack)
     res.status(500).send(toProblemDetails(err, res))
