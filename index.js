@@ -52,14 +52,6 @@ app.use(express.json());
 app.use(Sentry.Handlers.requestHandler());
 app.use(Sentry.Handlers.tracingHandler());
 
-app.use(
-    Sentry.Handlers.errorHandler({
-        shouldHandleError(error) {
-            return error.status === 500;
-        }
-    })
-);
-
 const roomsRepository = require("./tests/InMemoryRepositories/InMemoryRoomRepository")([]);
 
 app.post(RoomRoutes.CreateRoom, (req, res, next) => {
@@ -73,6 +65,15 @@ app.post(RoomRoutes.JoinRoom, (req, res, next) => {
         .then(res.send)
         .catch(next)
 });
+
+app.use(
+    Sentry.Handlers.errorHandler({
+        shouldHandleError(error) {
+            return error.status === 500;
+        }
+    })
+);
+
 
 app.use((err, req, res, next) => {
     console.error(err.stack)
