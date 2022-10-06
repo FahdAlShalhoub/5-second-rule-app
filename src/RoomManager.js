@@ -1,7 +1,6 @@
 const {faker} = require('@faker-js/faker');
 const ApiError = require("./Errors/ApiError");
 const HttpStatusCode = require("./HttpStatusCode");
-// const ApiError = require("./Errors/ApiError");
 
 module.exports = {
     generateRoom: (host, repository) => new Promise((resolve, reject) => {
@@ -14,16 +13,16 @@ module.exports = {
         repository.getActiveRoomByHostId(room.hostId)
             .then(ensureHostHasNoActiveRoom)
             .then(insertRoomToDb)
+            .catch(err => reject(err))
 
         function insertRoomToDb() {
             repository.addRoom(room)
                 .then(() => resolve(room))
-                .catch(err => reject(err));
         }
 
         function ensureHostHasNoActiveRoom(existingRoom) {
             if (existingRoom) {
-                reject(new ApiError("Host Already Has Room", HttpStatusCode.BadRequest))
+                throw new ApiError("Host Already Has Room", HttpStatusCode.BadRequest)
             }
         }
     }),
@@ -31,17 +30,19 @@ module.exports = {
     joinRoom: (player, roomId, repository) => new Promise((resolve, reject) => {
         repository.getActiveRoomById(roomId)
             .then(room => {
-                if(!room) reject(new ApiError("Room Does Not Exist", HttpStatusCode.BadRequest))
+                if(!room) throw new ApiError("Room Does Not Exist", HttpStatusCode.BadRequest)
+                return room;
+            })
+            .then(room => {
                 room.players.push(player)
                 return room;
             })
             .then(room => {
                 repository.updateRoom(room)
-                    .then(() => {
-                        resolve(room)
-                    })
+                    .then(() => resolve(room))
                     .catch(e => reject(e))
-            });
+            })
+            .catch(err => reject(err))
 
     })
 };

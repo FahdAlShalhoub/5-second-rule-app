@@ -10,6 +10,7 @@ const Tracing = require("@sentry/tracing");
 const app = express();
 const server = http.createServer(app);
 const {Server} = require("socket.io");
+const ApiError = require("./src/Errors/ApiError");
 const io = new Server(server);
 const port = process.env.PORT || 5100;
 const redisDbUrl = process.env.RedisDbUrl
@@ -73,10 +74,14 @@ app.use(
     })
 );
 
-
 app.use((err, req, res, next) => {
-    console.error(err.stack)
-    res.status(500).send(toProblemDetails(err, res))
+    if (err instanceof ApiError) {
+        res.status(err.statusCode).send(toProblemDetails(err, res))
+    } else {
+        console.error(err.stack)
+        Sentry.captureException(err);
+        res.status(500).send(toProblemDetails({...err, message: "Something Went Wrong"}, res))
+    }
 })
 
 const toProblemDetails = (err, res) => {

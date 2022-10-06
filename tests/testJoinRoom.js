@@ -50,13 +50,9 @@ describe("testJoinRoom", () => {
         const playerId = "ExamplePlayerId";
         const playerName = "ExamplePlayerName";
         const roomId = "ExampleRoomId";
-        const roomsRepository = roomRepositoryFactory([]);
 
-        RoomManager.joinRoom({playerId, playerName}, roomId, roomsRepository)
-            .then(() => {
-                expect(rooms[0].players).to.have.length(1)
-                done(new Error("Did Not Throw Error"));
-            })
+        RoomManager.joinRoom({playerId, playerName}, roomId, roomRepositoryFactory([]))
+            .then(() => done(new Error("Did Not Throw Error")))
             .catch(err => {
                 expect(err).to.be.instanceof(ApiError)
                 expect(err.statusCode).to.be.equal(400)
