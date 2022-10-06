@@ -1,13 +1,15 @@
 const {faker} = require('@faker-js/faker');
 const ApiError = require("./Errors/ApiError");
 const HttpStatusCode = require("./HttpStatusCode");
+const RoomStatus = require("./RoomStatuses");
 
 module.exports = {
     generateRoom: (host, repository) => new Promise((resolve, reject) => {
         const room = {
             host,
             players: [],
-            roomId: faker.random.words(3).replace(new RegExp(" ", 'g'), "-")
+            roomId: faker.random.words(3).replace(new RegExp(" ", 'g'), "-"),
+            roomStatus: RoomStatus.Active
         }
 
         repository.getActiveRoomByHostId(room.hostId)
