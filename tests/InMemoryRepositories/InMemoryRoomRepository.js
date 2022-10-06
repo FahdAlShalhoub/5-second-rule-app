@@ -15,8 +15,8 @@ module.exports = (rooms) => {
         getActiveRoomById: (roomId) => new Promise(resolve => {
             resolve(rooms.find(room => room.roomId === roomId && room.status === RoomStatus.Active))
         }),
-        updateRoom: (room) => new Promise((resolve, reject) => {
-            rooms = [...rooms.filter(rom => rom.roomId === room.roomId), room]
+        updateRoom: (room) => new Promise((resolve) => {
+            rooms = [...rooms.filter(rom => rom.roomId !== room.roomId), room]
             resolve();
         })
     }

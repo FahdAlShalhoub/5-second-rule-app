@@ -5,12 +5,11 @@ const roomRepositoryFactory = require("./InMemoryRepositories/InMemoryRoomReposi
 const ApiError = require("../src/Errors/ApiError");
 
 describe("testJoinRoom", () => {
-    let rooms;
     let roomsRepository;
-    let roomId = "ExampleRoomId";
+    const roomId = "ExampleRoomId";
 
     beforeEach(() => {
-        rooms = [{
+        const rooms = [{
             roomId,
             host: {hostId: "ExampleHostId", hostName: "ExampleHostName"},
             status: RoomStatuses.Active,
@@ -39,8 +38,9 @@ describe("testJoinRoom", () => {
         const roomId = "ExampleRoomId";
 
         RoomManager.joinRoom({playerId, playerName}, roomId, roomsRepository)
-            .then(() => {
-                expect(rooms[0].players).to.have.length(1)
+            .then(() => roomsRepository.getActiveRoomById(roomId))
+            .then(result => {
+                expect(result.players).to.have.length(1)
                 done();
             })
             .catch(err => done(err))
