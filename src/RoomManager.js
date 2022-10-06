@@ -7,7 +7,7 @@ module.exports = (repository) => ({
     generateRoom: (host) => new Promise((resolve, reject) => {
         const room = {
             host,
-            players: [],
+            players: [{playerName: host.hostName, playerId: host.hostId}],
             roomId: faker.random.words(3).replace(new RegExp(" ", 'g'), "-"),
             roomStatus: RoomStatus.Active
         }
