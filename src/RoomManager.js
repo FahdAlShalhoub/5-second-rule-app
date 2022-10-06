@@ -42,8 +42,12 @@ module.exports = (repository, socketManager) => ({
             .then(room => repository.updateRoom(room))
             .then((room) => {
                 socketManager
+                    .in(player.playerId)
+                    .socketsJoin(roomId)
+                socketManager
                     .to(room.roomId)
                     .emit("player_joined", room)
+
                 resolve(room)
             })
             .catch(err => reject(err))

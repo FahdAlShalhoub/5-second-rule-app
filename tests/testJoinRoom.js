@@ -8,8 +8,12 @@ describe("testJoinRoom", () => {
     let roomsRepository;
     let RoomManager;
     const roomId = "ExampleRoomId";
-    const emitSpy = sinon.spy(() => new Promise((resolve) => resolve()))
+    const emitSpy = sinon.spy()
+    const joinSpy = sinon.spy()
     const socketManagerSpy = sinon.spy({
+        in: () => ({
+            socketsJoin: joinSpy
+        }),
         to: () => ({
             emit: emitSpy
         })
@@ -18,6 +22,7 @@ describe("testJoinRoom", () => {
     beforeEach(() => {
         socketManagerSpy.to.resetHistory();
         emitSpy.resetHistory();
+        joinSpy.resetHistory();
 
         const rooms = [{
             roomId,
@@ -90,6 +95,22 @@ describe("testJoinRoom", () => {
             .then(() => roomsRepository.getActiveRoomById(roomId))
             .then((room) => {
                 expect(socketManagerSpy.to().emit.getCall(0).args[1]).to.deep.equal(room)
+                done()
+            })
+            .catch(err => {
+                done(err)
+            });
+    });
+
+    it('Should Add Client To Room', function (done) {
+        const playerId = "ExamplePlayerId";
+        const playerName = "ExamplePlayerName";
+        const roomId = "ExampleRoomId";
+
+        RoomManager.joinRoom({playerId, playerName}, roomId)
+            .then(() => {
+                expect(joinSpy.calledOnce).to.be.true
+                expect(joinSpy.getCall(0).args[0]).to.equal(roomId)
                 done()
             })
             .catch(err => {
