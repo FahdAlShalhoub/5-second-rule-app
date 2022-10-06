@@ -2,10 +2,9 @@ const express = require('express');
 const http = require('http');
 const redis = require("redis");
 const redisAdapter = require("@socket.io/redis-adapter");
-const RoomRoutes = require("./src/Routes");
-const RoomManager = require("./src/RoomManager");
 const Sentry = require("@sentry/node");
 const Tracing = require("@sentry/tracing");
+const RoomsRouter = require("./src/RoomsRouter");
 
 const app = express();
 const server = http.createServer(app);
@@ -50,22 +49,13 @@ Sentry.init({
     tracesSampleRate: 1.0,
 });
 
+//Middleware
 app.use(express.json());
 app.use(Sentry.Handlers.requestHandler());
 app.use(Sentry.Handlers.tracingHandler());
 
-const roomsRepository = require("./tests/InMemoryRepositories/InMemoryRoomRepository")([]);
-app.post(RoomRoutes.CreateRoom, (req, res, next) => {
-    RoomManager.generateRoom(req.body, roomsRepository)
-        .then(response => res.send(response))
-        .catch(next)
-});
-
-app.post(RoomRoutes.JoinRoom, (req, res, next) => {
-    RoomManager.joinRoom(req.body, req.params.roomId, roomsRepository)
-        .then(response => res.send(response))
-        .catch(next)
-});
+// Routes
+app.use("/v1/room", RoomsRouter)
 
 app.use(
     Sentry.Handlers.errorHandler({
