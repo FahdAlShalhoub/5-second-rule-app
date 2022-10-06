@@ -15,6 +15,7 @@ module.exports = (repository, socketManager) => ({
         repository.getActiveRoomByHostId(room.hostId)
             .then(ensureHostHasNoActiveRoom)
             .then(insertRoomToDb)
+            .then(addToSocketManagerRoom)
             .catch(err => reject(err))
 
         function insertRoomToDb() {
@@ -26,6 +27,10 @@ module.exports = (repository, socketManager) => ({
             if (existingRoom) {
                 throw new ApiError("Host Already Has Room", HttpStatusCode.BadRequest)
             }
+        }
+
+        function addToSocketManagerRoom() {
+            socketManager.in(host.hostId).socketsJoin(room.roomId)
         }
     }),
 
