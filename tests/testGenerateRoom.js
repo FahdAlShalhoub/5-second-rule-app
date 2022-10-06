@@ -1,15 +1,16 @@
 const expect = require('chai').expect;
-const RoomManager = require("../src/RoomManager");
 const RoomStatus = require("../src/RoomStatuses");
 const ApiError = require("../src/Errors/ApiError");
 
 describe("testGenerateRoom", () => {
     let rooms = [];
     let roomsRepository;
+    let RoomManager;
 
     beforeEach(() => {
         rooms = []
         roomsRepository = require("./InMemoryRepositories/InMemoryRoomRepository")(rooms)
+        RoomManager = require("../src/RoomManager")(roomsRepository)
     });
 
     it('Should Return New Room Successfully', function (done) {

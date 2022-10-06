@@ -3,8 +3,8 @@ const ApiError = require("./Errors/ApiError");
 const HttpStatusCode = require("./HttpStatusCode");
 const RoomStatus = require("./RoomStatuses");
 
-module.exports = {
-    generateRoom: (host, repository) => new Promise((resolve, reject) => {
+module.exports = (repository) => ({
+    generateRoom: (host) => new Promise((resolve, reject) => {
         const room = {
             host,
             players: [],
@@ -29,7 +29,7 @@ module.exports = {
         }
     }),
 
-    joinRoom: (player, roomId, repository) => new Promise((resolve, reject) => {
+    joinRoom: (player, roomId) => new Promise((resolve, reject) => {
         repository.getActiveRoomById(roomId)
             .then(room => {
                 if(!room) throw new ApiError("Room Does Not Exist", HttpStatusCode.BadRequest)
@@ -47,4 +47,4 @@ module.exports = {
             .catch(err => reject(err))
 
     })
-};
+});

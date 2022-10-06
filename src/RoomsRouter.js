@@ -1,7 +1,7 @@
 const express = require('express')
-const RoomManager = require("./RoomManager");
 const router = express.Router()
 const roomsRepository = require("../tests/InMemoryRepositories/InMemoryRoomRepository")([]);
+const RoomManager = require("./RoomManager")(roomsRepository);
 
 const RoomRoutes = {
     CreateRoom: "/",
@@ -9,13 +9,13 @@ const RoomRoutes = {
 }
 
 router.post(RoomRoutes.CreateRoom, (req, res, next) => {
-    RoomManager.generateRoom(req.body, roomsRepository)
+    RoomManager.generateRoom(req.body)
         .then(response => res.send(response))
         .catch(next)
 });
 
 router.post(RoomRoutes.JoinRoom, (req, res, next) => {
-    RoomManager.joinRoom(req.body, req.params.roomId, roomsRepository)
+    RoomManager.joinRoom(req.body, req.params.roomId)
         .then(response => res.send(response))
         .catch(next)
 });

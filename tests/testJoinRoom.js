@@ -1,4 +1,3 @@
-const RoomManager = require("../src/RoomManager");
 const RoomStatuses = require("../src/RoomStatuses");
 const expect = require("chai").expect;
 const roomRepositoryFactory = require("./InMemoryRepositories/InMemoryRoomRepository");
@@ -6,6 +5,7 @@ const ApiError = require("../src/Errors/ApiError");
 
 describe("testJoinRoom", () => {
     let roomsRepository;
+    let RoomManager;
     const roomId = "ExampleRoomId";
 
     beforeEach(() => {
@@ -16,6 +16,7 @@ describe("testJoinRoom", () => {
             players: []
         }];
         roomsRepository = require("./InMemoryRepositories/InMemoryRoomRepository")(rooms)
+        RoomManager = require("../src/RoomManager")(roomsRepository)
     })
 
     it('Should Return Joined Room Successfully', function (done) {
@@ -50,8 +51,9 @@ describe("testJoinRoom", () => {
         const playerId = "ExamplePlayerId";
         const playerName = "ExamplePlayerName";
         const roomId = "ExampleRoomId";
+        const RoomManager = require("../src/RoomManager")(roomRepositoryFactory([]))
 
-        RoomManager.joinRoom({playerId, playerName}, roomId, roomRepositoryFactory([]))
+        RoomManager.joinRoom({playerId, playerName}, roomId)
             .then(() => done(new Error("Did Not Throw Error")))
             .catch(err => {
                 expect(err).to.be.instanceof(ApiError)
