@@ -36,6 +36,7 @@ Promise.all([pubClient.connect(), subClient.connect()]).then(() => {
 
 Sentry.init({
     dsn: sentryDsn,
+    environment: process.env.NODE_ENV,
     integrations: [
         // enable HTTP calls tracing
         new Sentry.Integrations.Http({ tracing: true }),
