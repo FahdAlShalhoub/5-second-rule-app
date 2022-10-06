@@ -11,11 +11,9 @@ const port = process.env.PORT || 5100;
 const sentryDsn = process.env.SentryDsn
 const redisDbUrl = process.env.RedisDbUrl
 const redidDbPassword = process.env.RedisDbPassword
-
-const io = require("./src/SocketIoServer")(server, {
-    url: redisDbUrl,
-    password: redidDbPassword
-});
+const roomsRepository = require("./tests/InMemoryRepositories/InMemoryRoomRepository")([]);
+const io = require("./src/SocketIoServer")(server, {url: redisDbUrl, password: redidDbPassword});
+const RoomManager = require("./src/RoomManager")(roomsRepository, io);
 
 Sentry.init({
     dsn: sentryDsn,
@@ -39,7 +37,7 @@ app.use(Sentry.Handlers.requestHandler());
 app.use(Sentry.Handlers.tracingHandler());
 
 // Routes
-app.use("/v1/room", RoomsRouter)
+app.use("/v1/room", RoomsRouter(RoomManager))
 
 app.use(
     Sentry.Handlers.errorHandler({
