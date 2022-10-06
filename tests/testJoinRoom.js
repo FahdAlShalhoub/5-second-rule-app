@@ -22,7 +22,7 @@ describe("testJoinRoom", () => {
         const rooms = [{
             roomId,
             host: {hostId: "ExampleHostId", hostName: "ExampleHostName"},
-            status: RoomStatuses.Active,
+            roomStatus: RoomStatuses.Active,
             players: []
         }];
         roomsRepository = require("./InMemoryRepositories/InMemoryRoomRepository")(rooms)
