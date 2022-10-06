@@ -1,36 +1,20 @@
 const express = require('express');
 const http = require('http');
-const redis = require("redis");
-const redisAdapter = require("@socket.io/redis-adapter");
 const Sentry = require("@sentry/node");
 const Tracing = require("@sentry/tracing");
 const RoomsRouter = require("./src/RoomsRouter");
 
 const app = express();
 const server = http.createServer(app);
-const {Server} = require("socket.io");
 const ApiError = require("./src/Errors/ApiError");
-const io = new Server(server);
 const port = process.env.PORT || 5100;
+const sentryDsn = process.env.SentryDsn
 const redisDbUrl = process.env.RedisDbUrl
 const redidDbPassword = process.env.RedisDbPassword
-const sentryDsn = process.env.SentryDsn
 
-io.on('connection', (socket) => {
-    socket.on("helloo", (msg) => {
-        console.log(msg)
-    })
-});
-
-const pubClient = redis.createClient({
+const io = require("./src/SocketIoServer")(server, {
     url: redisDbUrl,
     password: redidDbPassword
-});
-const subClient = pubClient.duplicate();
-
-Promise.all([pubClient.connect(), subClient.connect()]).then(() => {
-    io.adapter(redisAdapter.createAdapter(pubClient, subClient));
-    io.listen(3000);
 });
 
 Sentry.init({
