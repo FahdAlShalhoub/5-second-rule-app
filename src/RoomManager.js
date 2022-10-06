@@ -3,7 +3,7 @@ const ApiError = require("./Errors/ApiError");
 const HttpStatusCode = require("./HttpStatusCode");
 const RoomStatus = require("./RoomStatuses");
 
-module.exports = (repository) => ({
+module.exports = (repository, socketManager) => ({
     generateRoom: (host) => new Promise((resolve, reject) => {
         const room = {
             host,
@@ -39,10 +39,12 @@ module.exports = (repository) => ({
                 room.players.push(player)
                 return room;
             })
-            .then(room => {
-                repository.updateRoom(room)
+            .then(room => repository.updateRoom(room))
+            .then((room) => {
+                socketManager
+                    .to(room.roomId)
+                    .emit("player_joined", room)
                     .then(() => resolve(room))
-                    .catch(e => reject(e))
             })
             .catch(err => reject(err))
 

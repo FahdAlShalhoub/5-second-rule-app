@@ -17,7 +17,7 @@ module.exports = (rooms) => {
         }),
         updateRoom: (room) => new Promise((resolve) => {
             rooms = [...rooms.filter(rom => rom.roomId !== room.roomId), room]
-            resolve();
+            resolve(room);
         })
     }
 }
