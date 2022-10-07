@@ -87,6 +87,6 @@ const generateGame = (room, categories) => ({
     roomId: room.roomId,
     numberOfTries: 3,
     categories,
-    currentPlayer: {...room.players[0], failedTries: []},
-    players: room.players.map(player => ({...player, failedTries: []}))
+    currentPlayer: {...room.players[0], remainingTries: 3, failedTries: []},
+    players: room.players.map(player => ({...player, remainingTries: 3, failedTries: []}))
 });

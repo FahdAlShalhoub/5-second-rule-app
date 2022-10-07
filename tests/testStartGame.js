@@ -47,17 +47,20 @@ describe('testStartGame', function () {
                 expect(game).to.have.property("currentPlayer").to.have.deep.equal({
                     playerId: host.hostId,
                     playerName: host.hostName,
+                    remainingTries: game.numberOfTries,
                     failedTries: []
                 })
                 expect(game).to.have.property("players").to.deep.members([
                     {
                         playerId: host.hostId,
                         playerName: host.hostName,
+                        remainingTries: game.numberOfTries,
                         failedTries: []
                     },
                     {
                         playerId: "ExamplePlayerId",
                         playerName: "ExamplePlayerName",
+                        remainingTries: game.numberOfTries,
                         failedTries: []
                     }
                 ])
@@ -75,17 +78,20 @@ describe('testStartGame', function () {
                 expect(emitSpy.getCall(0).args[1]).to.have.property("currentPlayer").to.have.deep.equal({
                     playerId: host.hostId,
                     playerName: host.hostName,
+                    remainingTries: emitSpy.getCall(0).args[1].numberOfTries,
                     failedTries: []
                 })
                 expect(emitSpy.getCall(0).args[1]).to.have.property("players").to.deep.members([
                     {
                         playerId: host.hostId,
                         playerName: host.hostName,
+                        remainingTries: emitSpy.getCall(0).args[1].numberOfTries,
                         failedTries: []
                     },
                     {
                         playerId: "ExamplePlayerId",
                         playerName: "ExamplePlayerName",
+                        remainingTries: emitSpy.getCall(0).args[1].numberOfTries,
                         failedTries: []
                     }
                 ])
@@ -103,17 +109,20 @@ describe('testStartGame', function () {
                 expect(savedGame).to.have.property("currentPlayer").to.have.deep.equal({
                     playerId: host.hostId,
                     playerName: host.hostName,
+                    remainingTries: savedGame.numberOfTries,
                     failedTries: []
                 })
                 expect(savedGame).to.have.property("players").to.deep.members([
                     {
                         playerId: host.hostId,
                         playerName: host.hostName,
+                        remainingTries: savedGame.numberOfTries,
                         failedTries: []
                     },
                     {
                         playerId: "ExamplePlayerId",
                         playerName: "ExamplePlayerName",
+                        remainingTries: savedGame.numberOfTries,
                         failedTries: []
                     }
                 ])
