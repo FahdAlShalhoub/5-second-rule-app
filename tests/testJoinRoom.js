@@ -8,6 +8,7 @@ describe("testJoinRoom", () => {
     let roomsRepository;
     let RoomManager;
     const roomId = "ExampleRoomId";
+    const host = {hostId: "ExampleHostId", hostName: "ExampleHostName"}
     const emitSpy = sinon.spy()
     const joinSpy = sinon.spy()
     const socketManagerSpy = sinon.spy({
@@ -26,9 +27,9 @@ describe("testJoinRoom", () => {
 
         const rooms = [{
             roomId,
-            host: {hostId: "ExampleHostId", hostName: "ExampleHostName"},
+            host,
             roomStatus: RoomStatuses.Active,
-            players: []
+            players: [{playerId: "ExampleHostId", playerName: "ExampleHostName"}]
         }];
         roomsRepository = require("../src/Repositories/InMemoryRoomRepository")(rooms)
         RoomManager = require("../src/RoomManager")(roomsRepository)
@@ -40,8 +41,11 @@ describe("testJoinRoom", () => {
         const roomId = "ExampleRoomId";
 
         RoomManager.joinRoom(socketManagerSpy)({playerId, playerName}, roomId, roomsRepository)
-            .then((result) => {
-                expect(result.players).to.have.deep.members([{playerId, playerName}])
+            .then((room) => {
+                expect(room.players).to.have.deep.members([{
+                    playerId: host.hostId,
+                    playerName: host.hostName
+                }, {playerId, playerName}])
                 done();
             })
             .catch(err => done(err))
@@ -55,7 +59,7 @@ describe("testJoinRoom", () => {
         RoomManager.joinRoom(socketManagerSpy)({playerId, playerName}, roomId, roomsRepository)
             .then(() => roomsRepository.getActiveRoomById(roomId))
             .then(result => {
-                expect(result.players).to.have.length(1)
+                expect(result.players).to.have.length(2)
                 done();
             })
             .catch(err => done(err))
@@ -111,6 +115,20 @@ describe("testJoinRoom", () => {
             .then(() => {
                 expect(joinSpy.calledOnce).to.be.true
                 expect(joinSpy.getCall(0).args[0]).to.equal(roomId)
+                done()
+            })
+            .catch(err => {
+                done(err)
+            });
+    });
+
+    it('Should Not Duplicate Player If Player Is Already In Room', function (done) {
+        const roomId = "ExampleRoomId";
+
+        RoomManager.joinRoom(socketManagerSpy)({playerId: host.hostId, playerName: host.hostName}, roomId)
+            .then(() => roomsRepository.getActiveRoomById(roomId))
+            .then((room) => {
+                expect(room.players).to.have.length(1)
                 done()
             })
             .catch(err => {

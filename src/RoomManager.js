@@ -48,8 +48,10 @@ const ensureRoomExists = room => {
 };
 
 const addPlayerToRoom = (room, player) => {
-    room.players.push(player)
-    return room;
+    return {
+        ...room,
+        players: [...room.players.filter(playerInRoom => player.playerId !== playerInRoom.playerId), player]
+    };
 };
 
 const emitEventToSocketRoom = (socketManager) => (eventName, room) => {
