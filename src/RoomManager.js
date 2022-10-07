@@ -4,26 +4,20 @@ const HttpStatusCode = require("./HttpStatusCode");
 const RoomStatus = require("./RoomStatuses");
 
 module.exports = (repository, socketManager) => ({
-    generateRoom: (host) => new Promise((resolve, reject) => {
+    generateRoom: (host) =>
         repository.getActiveRoomByHostId(host.hostId)
             .then(room => ensureHostHasNoActiveRoom(room))
             .then(() => generateRoom(host))
             .then(room => addRoom(repository)(room))
-            .then(room => addPlayerToSocketRoom(socketManager)(host.hostId, room))
-            .then(resolve)
-            .catch(reject)
-    }),
+            .then(room => addPlayerToSocketRoom(socketManager)(host.hostId, room)),
 
-    joinRoom: (player, roomId) => new Promise((resolve, reject) => {
+    joinRoom: (player, roomId) =>
         repository.getActiveRoomById(roomId)
             .then(room => ensureRoomExists(room))
             .then(room => addPlayerToRoom(room, player))
             .then(room => updateRoom(repository)(room))
             .then(room => addPlayerToSocketRoom(socketManager)(player.playerId, room))
-            .then(room => emitPlayerJoinedEventToRoom(socketManager)(room))
-            .then(resolve)
-            .catch(reject)
-    })
+            .then(room => emitEventToSocketRoom(socketManager)("player_joined", room))
 });
 
 const generateRoom = (host) => {
@@ -56,8 +50,8 @@ const addPlayerToRoom = (room, player) => {
     return room;
 };
 
-const emitPlayerJoinedEventToRoom = (socketManager) => (room) => {
-    socketManager.to(room.roomId).emit("player_joined", room)
+const emitEventToSocketRoom = (socketManager) => (eventName, room) => {
+    socketManager.to(room.roomId).emit(eventName, room)
     return room
 }
 
