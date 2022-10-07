@@ -31,7 +31,7 @@ describe("testJoinRoom", () => {
             roomStatus: RoomStatuses.Active,
             players: [{playerId: "ExampleHostId", playerName: "ExampleHostName"}]
         }];
-        roomsRepository = require("../src/Repositories/InMemoryRoomRepository")(rooms)
+        roomsRepository = require("../src/Repositories/InMemoryRoomRepository")(rooms, [])
         RoomManager = require("../src/RoomManager")(roomsRepository)
     })
 

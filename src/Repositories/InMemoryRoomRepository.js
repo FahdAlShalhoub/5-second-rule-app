@@ -1,5 +1,5 @@
 const RoomStatus = require("../RoomStatuses");
-module.exports = (rooms) => {
+module.exports = (rooms, games) => {
     return {
         rooms,
         addRoom: (room) => new Promise((resolve, reject) => {
@@ -19,6 +19,17 @@ module.exports = (rooms) => {
         updateRoom: (room) => new Promise((resolve) => {
             rooms = [...rooms.filter(rom => rom.roomId !== room.roomId), room]
             resolve(room);
+        }),
+        addGame: (game) => new Promise((resolve, reject) => {
+            try {
+                games.push(game)
+                resolve(game);
+            } catch (e) {
+                reject(e)
+            }
+        }),
+        getGameByRoomId: (roomId) => new Promise((resolve) => {
+            resolve(games.find(game => game.roomId === roomId));
         })
     }
 }

@@ -1,0 +1,166 @@
+const sinon = require("sinon");
+const RoomStatuses = require("../src/RoomStatuses");
+const roomRepositoryFactory = require("../src/Repositories/InMemoryRoomRepository");
+const ApiError = require("../src/Errors/ApiError");
+const expect = require("chai").expect;
+
+describe('testStartGame', function () {
+    let roomsRepository;
+    let RoomManager;
+    const roomId = "ExampleRoomId";
+    const host = {hostId: "ExampleHostId", hostName: "ExampleHostName"}
+    const emitSpy = sinon.spy()
+    const joinSpy = sinon.spy()
+    const socketManagerSpy = sinon.spy({
+        in: () => ({
+            socketsJoin: joinSpy
+        }),
+        to: () => ({
+            emit: emitSpy
+        })
+    });
+
+    beforeEach(() => {
+        socketManagerSpy.to.resetHistory();
+        emitSpy.resetHistory();
+        joinSpy.resetHistory();
+
+        const rooms = [{
+            roomId,
+            host,
+            roomStatus: RoomStatuses.Active,
+            players: [{playerId: "ExampleHostId", playerName: "ExampleHostName"}, {
+                playerId: "ExamplePlayerId",
+                playerName: "ExamplePlayerName"
+            }]
+        }];
+        const games = [];
+        roomsRepository = roomRepositoryFactory(rooms, games)
+        RoomManager = require("../src/RoomManager")(roomsRepository)
+    })
+
+    it('Should Return Game Successfully', function (done) {
+        RoomManager.startGame(socketManagerSpy)(roomId, ["category1", "category2", "category3"])
+            .then((game) => {
+                expect(game).to.have.property("numberOfTries").to.equal(3)
+                expect(game).to.have.property("categories").to.have.members(["category1", "category2", "category3"])
+                expect(game).to.have.property("currentPlayer").to.have.deep.equal({
+                    playerId: host.hostId,
+                    playerName: host.hostName,
+                    failedTries: []
+                })
+                expect(game).to.have.property("players").to.deep.members([
+                    {
+                        playerId: host.hostId,
+                        playerName: host.hostName,
+                        failedTries: []
+                    },
+                    {
+                        playerId: "ExamplePlayerId",
+                        playerName: "ExamplePlayerName",
+                        failedTries: []
+                    }
+                ])
+                done()
+            })
+            .catch(err => done(err))
+    });
+
+    it('Should Emit Game Started Event Successfully', function (done) {
+        RoomManager.startGame(socketManagerSpy)(roomId, ["category1", "category2", "category3"])
+            .then(() => {
+                expect(emitSpy.getCall(0).args[0]).to.have.equal("game_started")
+                expect(emitSpy.getCall(0).args[1]).to.have.property("numberOfTries").to.equal(3)
+                expect(emitSpy.getCall(0).args[1]).to.have.property("categories").to.have.members(["category1", "category2", "category3"])
+                expect(emitSpy.getCall(0).args[1]).to.have.property("currentPlayer").to.have.deep.equal({
+                    playerId: host.hostId,
+                    playerName: host.hostName,
+                    failedTries: []
+                })
+                expect(emitSpy.getCall(0).args[1]).to.have.property("players").to.deep.members([
+                    {
+                        playerId: host.hostId,
+                        playerName: host.hostName,
+                        failedTries: []
+                    },
+                    {
+                        playerId: "ExamplePlayerId",
+                        playerName: "ExamplePlayerName",
+                        failedTries: []
+                    }
+                ])
+                done()
+            })
+            .catch(err => done(err))
+    });
+
+    it('Should Save Game Successfully', function (done) {
+        RoomManager.startGame(socketManagerSpy)(roomId, ["category1", "category2", "category3"])
+            .then(() => roomsRepository.getGameByRoomId(roomId))
+            .then((savedGame) => {
+                expect(savedGame).to.have.property("numberOfTries").to.equal(3)
+                expect(savedGame).to.have.property("categories").to.have.members(["category1", "category2", "category3"])
+                expect(savedGame).to.have.property("currentPlayer").to.have.deep.equal({
+                    playerId: host.hostId,
+                    playerName: host.hostName,
+                    failedTries: []
+                })
+                expect(savedGame).to.have.property("players").to.deep.members([
+                    {
+                        playerId: host.hostId,
+                        playerName: host.hostName,
+                        failedTries: []
+                    },
+                    {
+                        playerId: "ExamplePlayerId",
+                        playerName: "ExamplePlayerName",
+                        failedTries: []
+                    }
+                ])
+                done()
+            })
+            .catch(err => done(err))
+    });
+
+    it('Should Throw Error If Room Does Not Exist', function (done) {
+        const RoomManager = require("../src/RoomManager")(roomRepositoryFactory([]))
+
+        RoomManager.startGame(socketManagerSpy)(roomId, [])
+            .then(() => done(new Error("Did Not Throw Error")))
+            .catch(err => {
+                expect(err).to.be.instanceof(ApiError)
+                expect(err.statusCode).to.be.equal(400)
+                expect(err.message).equal("Room Does Not Exist")
+                done();
+            })
+            .catch(err => {
+                done(err)
+            });
+    });
+
+    it('Should Throw Error If Room Has Only One Player', function (done) {
+        const rooms = [{
+            roomId,
+            host,
+            roomStatus: RoomStatuses.Active,
+            players: [{
+                playerId: "ExamplePlayerId",
+                playerName: "ExamplePlayerName"
+            }]
+        }];
+        roomsRepository = roomRepositoryFactory(rooms)
+        RoomManager = require("../src/RoomManager")(roomsRepository)
+
+        RoomManager.startGame(socketManagerSpy)(roomId, ["category1", "category2", "category3"])
+            .then(() => done(new Error("Did Not Throw Error")))
+            .catch(err => {
+                expect(err).to.be.instanceof(ApiError)
+                expect(err.statusCode).to.be.equal(400)
+                expect(err.message).equal("Room Does Not Have Enough Players")
+                done();
+            })
+            .catch(err => {
+                done(err)
+            });
+    });
+});
