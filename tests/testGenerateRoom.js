@@ -58,7 +58,7 @@ describe("testGenerateRoom", () => {
     it('Should Not Save Active Room With Duplicate HostId', function (done) {
         const hostId = "ExampleHostId";
         const hostName = "ExampleName";
-        rooms.push({host: {hostId, hostName}, status: RoomStatus.Active, players: []});
+        rooms.push({host: {hostId, hostName}, roomStatus: RoomStatus.Active, players: []});
 
         RoomManager.generateRoom({hostId, hostName}, roomsRepository)
             .then(() => {
@@ -76,7 +76,7 @@ describe("testGenerateRoom", () => {
     it('Should Save New Room If Other Existing Room Is Inactive', function (done) {
         const hostId = "ExampleHostId";
         const hostName = "ExampleName";
-        const oldRoom = {host: {hostId, hostName}, status: RoomStatus.Disbanded, players: []};
+        const oldRoom = {host: {hostId, hostName}, roomStatus: RoomStatus.Disbanded, players: []};
         rooms.push(oldRoom);
 
         RoomManager.generateRoom({hostId, hostName}, roomsRepository)
