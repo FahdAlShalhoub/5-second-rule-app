@@ -1,6 +1,6 @@
 const RoomStatuses = require("../src/RoomStatuses");
 const expect = require("chai").expect;
-const roomRepositoryFactory = require("./InMemoryRepositories/InMemoryRoomRepository");
+const roomRepositoryFactory = require("../src/Repositories/InMemoryRoomRepository");
 const ApiError = require("../src/Errors/ApiError");
 const sinon = require("sinon");
 
@@ -30,7 +30,7 @@ describe("testJoinRoom", () => {
             roomStatus: RoomStatuses.Active,
             players: []
         }];
-        roomsRepository = require("./InMemoryRepositories/InMemoryRoomRepository")(rooms)
+        roomsRepository = require("../src/Repositories/InMemoryRoomRepository")(rooms)
         RoomManager = require("../src/RoomManager")(roomsRepository, socketManagerSpy)
     })
 

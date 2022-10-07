@@ -1,4 +1,4 @@
-const RoomStatus = require("../../src/RoomStatuses");
+const RoomStatus = require("../RoomStatuses");
 module.exports = (rooms) => {
     return {
         rooms,

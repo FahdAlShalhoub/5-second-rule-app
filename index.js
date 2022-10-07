@@ -11,7 +11,7 @@ const port = process.env.PORT || 5100;
 const sentryDsn = process.env.SentryDsn
 const redisDbUrl = process.env.RedisDbUrl
 const redidDbPassword = process.env.RedisDbPassword
-const roomsRepository = require("./tests/InMemoryRepositories/InMemoryRoomRepository")([]);
+const roomsRepository = require("./src/Repositories/InMemoryRoomRepository")([]);
 const io = require("./src/SocketIoServer")(server, {url: redisDbUrl, password: redidDbPassword});
 const RoomManager = require("./src/RoomManager")(roomsRepository, io);
 

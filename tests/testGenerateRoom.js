@@ -17,7 +17,7 @@ describe("testGenerateRoom", () => {
     beforeEach(() => {
         rooms = []
         joinSpy.resetHistory();
-        roomsRepository = require("./InMemoryRepositories/InMemoryRoomRepository")(rooms)
+        roomsRepository = require("../src/Repositories/InMemoryRoomRepository")(rooms)
         RoomManager = require("../src/RoomManager")(roomsRepository, socketManagerSpy)
     });
 
