@@ -5,15 +5,15 @@ const RoomRoutes = {
     JoinRoom: "/:roomId/players"
 }
 
-module.exports = (RoomManager) => {
+module.exports = (RoomManager, io) => {
     router.post(RoomRoutes.CreateRoom, (req, res, next) => {
-        RoomManager.generateRoom(req.body)
+        RoomManager.generateRoom(io)(req.body)
             .then(response => res.send(response))
             .catch(next)
     });
 
     router.post(RoomRoutes.JoinRoom, (req, res, next) => {
-        RoomManager.joinRoom(req.body, req.params.roomId)
+        RoomManager.joinRoom(io)(req.body, req.params.roomId)
             .then(response => res.send(response))
             .catch(next)
     });

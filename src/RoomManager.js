@@ -3,22 +3,24 @@ const ApiError = require("./Errors/ApiError");
 const HttpStatusCode = require("./HttpStatusCode");
 const RoomStatus = require("./RoomStatuses");
 
-module.exports = (repository, socketManager) => ({
-    generateRoom: (host) =>
-        repository.getActiveRoomByHostId(host.hostId)
-            .then(room => ensureHostHasNoActiveRoom(room))
-            .then(() => generateRoom(host))
-            .then(room => addRoom(repository)(room))
-            .then(room => addPlayerToSocketRoom(socketManager)(host.hostId, room)),
+module.exports = (repository) => {
+    return {
+        generateRoom: (io) => (host) =>
+            repository.getActiveRoomByHostId(host.hostId)
+                .then(room => ensureHostHasNoActiveRoom(room))
+                .then(() => generateRoom(host))
+                .then(room => addRoom(repository)(room))
+                .then(room => addPlayerToSocketRoom(io)(host.hostId, room)),
 
-    joinRoom: (player, roomId) =>
-        repository.getActiveRoomById(roomId)
-            .then(room => ensureRoomExists(room))
-            .then(room => addPlayerToRoom(room, player))
-            .then(room => updateRoom(repository)(room))
-            .then(room => addPlayerToSocketRoom(socketManager)(player.playerId, room))
-            .then(room => emitEventToSocketRoom(socketManager)("player_joined", room))
-});
+        joinRoom: (io) => (player, roomId) =>
+            repository.getActiveRoomById(roomId)
+                .then(room => ensureRoomExists(room))
+                .then(room => addPlayerToRoom(room, player))
+                .then(room => updateRoom(repository)(room))
+                .then(room => addPlayerToSocketRoom(io)(player.playerId, room))
+                .then(room => emitEventToSocketRoom(io)("player_joined", room))
+    }
+};
 
 const generateRoom = (host) => {
     return {

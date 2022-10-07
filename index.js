@@ -13,7 +13,7 @@ const redisDbUrl = process.env.RedisDbUrl
 const redidDbPassword = process.env.RedisDbPassword
 const roomsRepository = require("./src/Repositories/InMemoryRoomRepository")([]);
 const io = require("./src/SocketIoServer")(server, {url: redisDbUrl, password: redidDbPassword});
-const RoomManager = require("./src/RoomManager")(roomsRepository, io);
+const RoomManager = require("./src/RoomManager")(roomsRepository);
 
 Sentry.init({
     dsn: sentryDsn,
@@ -37,7 +37,7 @@ app.use(Sentry.Handlers.requestHandler());
 app.use(Sentry.Handlers.tracingHandler());
 
 // Routes
-app.use("/v1/room", RoomsRouter(RoomManager))
+app.use("/v1/room", RoomsRouter(RoomManager, io))
 
 app.use(
     Sentry.Handlers.errorHandler({

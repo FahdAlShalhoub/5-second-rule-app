@@ -25,7 +25,7 @@ describe("testGenerateRoom", () => {
         const hostId = "ExampleHostId";
         const hostName = "ExampleName";
 
-        RoomManager.generateRoom({hostId, hostName}, roomsRepository)
+        RoomManager.generateRoom(socketManagerSpy)({hostId, hostName}, roomsRepository)
             .then(result => {
                 expect(result).to.have.property("host").to.have.property("hostName").to.equal(hostName)
                 expect(result).to.have.property("host").to.have.property("hostId").to.equal(hostId)
@@ -46,7 +46,7 @@ describe("testGenerateRoom", () => {
         const hostId = "ExampleHostId";
         const hostName = "ExampleName";
 
-        RoomManager.generateRoom({hostId, hostName}, roomsRepository)
+        RoomManager.generateRoom(socketManagerSpy)({hostId, hostName}, roomsRepository)
             .then(result => {
                 expect(rooms).to.have.members([result]);
                 done()
@@ -60,7 +60,7 @@ describe("testGenerateRoom", () => {
         const hostName = "ExampleName";
         rooms.push({host: {hostId, hostName}, roomStatus: RoomStatus.Active, players: []});
 
-        RoomManager.generateRoom({hostId, hostName}, roomsRepository)
+        RoomManager.generateRoom(socketManagerSpy)({hostId, hostName}, roomsRepository)
             .then(() => {
                 done(new Error("Saved Rooms With Same Host " + JSON.stringify(rooms)))
             })
@@ -79,7 +79,7 @@ describe("testGenerateRoom", () => {
         const oldRoom = {host: {hostId, hostName}, roomStatus: RoomStatus.Disbanded, players: []};
         rooms.push(oldRoom);
 
-        RoomManager.generateRoom({hostId, hostName}, roomsRepository)
+        RoomManager.generateRoom(socketManagerSpy)({hostId, hostName}, roomsRepository)
             .then(result => {
                 expect(rooms).to.have.members([result, oldRoom]);
                 done()
@@ -91,7 +91,7 @@ describe("testGenerateRoom", () => {
         const hostId = "ExampleHostId";
         const hostName = "ExampleName";
 
-        RoomManager.generateRoom({hostId, hostName}, roomsRepository)
+        RoomManager.generateRoom(socketManagerSpy)({hostId, hostName}, roomsRepository)
             .then(() => {
                 expect(joinSpy.calledOnce).to.be.true
                 expect(joinSpy.getCall(0).args[0]).to.match(new RegExp("^.*-.*-.*$"))
