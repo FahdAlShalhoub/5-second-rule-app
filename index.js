@@ -11,7 +11,7 @@ const port = process.env.PORT || 5100;
 const sentryDsn = process.env.SentryDsn
 const redisDbUrl = process.env.RedisDbUrl
 const redidDbPassword = process.env.RedisDbPassword
-const roomsRepository = require("./src/Repositories/InMemoryRoomRepository")([]);
+const roomsRepository = require("./src/Repositories/InMemoryRoomRepository")([], []);
 const io = require("./src/SocketIoServer")(server, {url: redisDbUrl, password: redidDbPassword});
 const RoomManager = require("./src/RoomManager")(roomsRepository);
 
@@ -48,25 +48,17 @@ app.use(
 );
 
 app.use((err, req, res, next) => {
+    res.set("Content-Type", "application/problem+json")
+    res.set("Content-Language", "ar")
+
     if (err instanceof ApiError) {
-        res.status(err.statusCode).send(toProblemDetails(err, res))
+        res.status(err.statusCode).send(ApiError.toProblemDetails(err))
     } else {
         console.error(err.stack)
         Sentry.captureException(err);
-        res.status(500).send(toProblemDetails({...err, message: "Something Went Wrong"}, res))
+        res.status(500).send(ApiError.toProblemDetails({...err, message: "Something Went Wrong"}, res))
     }
 })
-
-const toProblemDetails = (err, res) => {
-    res.set("Content-Type", "application/problem+json")
-    res.set("Content-Language", "ar")
-    return {
-        type: "about:blank",
-        title: err.message,
-        details: err.message,
-        instance: ""
-    }
-}
 
 server.listen(port, () => {
     console.log(`Server Started At Port: ${port}`);
