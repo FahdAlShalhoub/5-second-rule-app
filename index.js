@@ -50,8 +50,14 @@ io.on("connection", (socket) => {
 
     socket.on(RoomEvents.received.TIME_RAN_OUT, (arg1, arg2, callback) => {
         RoomManager.timeRanOut(io)(arg1, Array.from(socket.rooms)[1], arg2)
-            .then((game) => callback(game))
-            .catch(err => callback(ApiError.toProblemDetails(err)))
+            .then((game) => {
+                console.log(game)
+                callback(game)
+            })
+            .catch(err => {
+                console.log(err)
+                callback(ApiError.toProblemDetails(err))
+            })
     })
 
     socket.on(RoomEvents.received.QUESTION_ANSWERED, (arg) => {

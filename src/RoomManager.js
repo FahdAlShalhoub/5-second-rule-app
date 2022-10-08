@@ -35,15 +35,15 @@ module.exports = (repository) => ({
         repository.getGameById(gameId)
             .then(game => nextTurn(game))
             .then(game => startCurrentPlayerTurn(io)(repository)(game))
-            .then(game => updateGame(game)),
+            .then(game => updateGame(repository)(game)),
 
     timeRanOut: (io) => (gameId, playerId, question) =>
         repository.getGameById(gameId)
             .then(game => eliminateTryFromCurrentPlayer(game, question))
-            .then(game => endGameIfNoMorePlayers(game))
+            .then(game => endGameIfNoMorePlayers(io)(game))
             .then(game => nextTurn(game))
             .then(game => startCurrentPlayerTurn(io)(repository)(game))
-            .then(game => updateGame(game))
+            .then(game => updateGame(repository)(game))
 
 });
 
@@ -144,5 +144,8 @@ const endGameIfNoMorePlayers = io => game => {
     if (activePlayers.length === 1) {
         game.players = game.players.sort((a, b) => (a.remainingTries > b.remainingTries) ? 1 : ((b.remainingTries > a.remainingTries) ? -1 : 0))
         emitEventToSocketRoom(io)(RoomEvents.sent.GAME_FINISHED, game)
+        throw new ApiError("Game Ended", HttpStatusCode.BadRequest)
     }
+
+    return game;
 };
