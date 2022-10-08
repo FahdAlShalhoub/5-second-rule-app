@@ -35,6 +35,7 @@ module.exports = (repository) => ({
         repository.getGameById(gameId)
             .then(game => nextTurn(game))
             .then(game => startCurrentPlayerTurn(io)(repository)(game))
+            .then(game => updateGame(game)),
 
 });
 
@@ -91,6 +92,10 @@ const addRoom = (repository) => (room) => {
 
 const addGame = (repository) => (game) => {
     return repository.addGame(game)
+}
+
+const updateGame = (repository) => (game) => {
+    return repository.updateGame(game)
 }
 
 const generateGame = (room, categories) => ({

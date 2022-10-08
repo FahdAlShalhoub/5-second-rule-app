@@ -28,6 +28,10 @@ module.exports = (rooms, games, questions) => {
                 reject(e)
             }
         }),
+        updateGame: (game) => new Promise((resolve) => {
+            games = [...games.filter(gam => gam.gameId !== game.gameId), game]
+            resolve(game);
+        }),
         getGameByRoomId: (roomId) => new Promise((resolve) => {
             resolve(games.find(game => game.roomId === roomId));
         }),
