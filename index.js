@@ -48,22 +48,18 @@ io.on("connection", (socket) => {
             .catch(err => callback(ApiError.toProblemDetails(err)))
     })
 
-    socket.on(RoomEvents.received.TIME_RAN_OUT, (arg, callback) => {
-        RoomManager.timeRanOut(io)(arg[0], Array.from(socket.rooms)[1], arg[1])
+    socket.on(RoomEvents.received.TIME_RAN_OUT, (arg1, arg2, callback) => {
+        RoomManager.timeRanOut(io)(arg1, Array.from(socket.rooms)[1], arg2)
             .then((game) => callback(game))
             .catch(err => callback(ApiError.toProblemDetails(err)))
     })
 
-    socket.on(RoomEvents.received.QUESTION_ANSWERED, (arg, callback) => {
-        RoomManager.questionAnswered(io)(arg[0])
-            .then((game) => callback(game))
-            .catch(err => callback(ApiError.toProblemDetails(err)))
+    socket.on(RoomEvents.received.QUESTION_ANSWERED, (arg) => {
+        RoomManager.questionAnswered(io)(arg)
     })
 
-    socket.on(RoomEvents.received.KICK_ME, (arg, callback) => {
+    socket.on(RoomEvents.received.KICK_ME, (arg) => {
         RoomManager.startGame(io)(Array.from(socket.rooms)[1], arg.categories)
-            .then((game) => callback(game))
-            .catch(err => callback(ApiError.toProblemDetails(err)))
     })
 });
 
