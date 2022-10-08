@@ -12,7 +12,7 @@ const port = process.env.PORT || 5100;
 const sentryDsn = process.env.SentryDsn
 const redisDbUrl = process.env.RedisDbUrl
 const redidDbPassword = process.env.RedisDbPassword
-const roomsRepository = require("./src/Repositories/InMemoryRoomRepository")([], [], {question: "اذكر اسماء ثلاث شخصيات من باب الحارة", category: "movies"});
+const roomsRepository = require("./src/Repositories/InMemoryRoomRepository")([], [], [{question: "اذكر اسماء ثلاث شخصيات من باب الحارة", category: "movies"}]);
 const io = require("./src/SocketIoServer")(server, {url: redisDbUrl, password: redidDbPassword});
 const RoomManager = require("./src/RoomManager")(roomsRepository);
 
