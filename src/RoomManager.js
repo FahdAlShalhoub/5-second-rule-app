@@ -144,7 +144,7 @@ const eliminateTryFromCurrentPlayer = (game, question) => {
 const endGameIfNoMorePlayers = io => game => {
     const activePlayers = game.players.filter(player => player.remainingTries >= player.failedTries.length);
     if (activePlayers.length === 1) {
-        game.players = game.players.sort((a, b) => (a.remainingTries > b.remainingTries) ? 1 : ((b.remainingTries > a.remainingTries) ? -1 : 0))
+        game.players = game.players.sort((a, b) => (a.remainingTries > b.remainingTries) ? -1 : ((b.remainingTries > a.remainingTries) ? 1 : 0))
         emitEventToSocketRoom(io)(RoomEvents.sent.GAME_FINISHED, game)
         return Promise.reject(game)
     }
