@@ -55,7 +55,7 @@ io.on("connection", (socket) => {
     })
 
     socket.on(RoomEvents.received.QUESTION_ANSWERED, (arg, callback) => {
-        RoomManager.startGame(io)(Array.from(socket.rooms)[1], arg.categories)
+        RoomManager.questionAnswered(io)(arg[0])
             .then((game) => callback(game))
             .catch(err => callback(ApiError.toProblemDetails(err)))
     })

@@ -31,6 +31,9 @@ module.exports = (rooms, games, questions) => {
         getGameByRoomId: (roomId) => new Promise((resolve) => {
             resolve(games.find(game => game.roomId === roomId));
         }),
-        getAllQuestions: () => questions
+        getAllQuestions: () => questions,
+        getGameById: (gameId) => new Promise((resolve) => {
+            resolve(games.find(game => game.gameId === gameId))
+        })
     }
 }

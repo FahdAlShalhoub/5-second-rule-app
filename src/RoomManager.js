@@ -31,6 +31,11 @@ module.exports = (repository) => ({
             .then(game => emitEventToSocketRoom(io)(RoomEvents.sent.GAME_STARTED, game))
             .then(game => startCurrentPlayerTurn(io)(repository)(game)),
 
+    questionAnswered: (io) => (gameId) =>
+        repository.getGameById(gameId)
+            .then(game => nextTurn(game))
+            .then(game => startCurrentPlayerTurn(io)(repository)(game))
+
 });
 
 const generateRoom = (host) => {
