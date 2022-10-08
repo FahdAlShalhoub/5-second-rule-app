@@ -39,6 +39,19 @@ app.use(Sentry.Handlers.tracingHandler());
 // Routes
 app.use("/v1/room", RoomsRouter(RoomManager, io))
 
+io.on("connection", (socket) => {
+    console.log(socket.id)
+    socket.on("start_game", (arg, callback) => {
+        RoomManager.startGame(io)(Array.from(socket.rooms)[1], arg.categories)
+            .then((game) => {
+                callback(game)
+            })
+            .catch(err => {
+                callback(ApiError.toProblemDetails(err))
+            })
+    })
+});
+
 app.use(
     Sentry.Handlers.errorHandler({
         shouldHandleError(error) {

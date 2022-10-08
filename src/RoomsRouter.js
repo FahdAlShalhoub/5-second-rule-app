@@ -1,5 +1,4 @@
 const express = require('express')
-const ApiError = require("./Errors/ApiError");
 const router = express.Router()
 const RoomRoutes = {
     CreateRoom: "/",
@@ -17,19 +16,6 @@ module.exports = (RoomManager, io) => {
         RoomManager.joinRoom(io)(req.body, req.params.roomId)
             .then(response => res.send(response))
             .catch(next)
-    });
-
-    io.on("connection", (socket) => {
-        console.log(socket.id)
-        socket.on("start_game", (arg, callback) => {
-            RoomManager.startGame(io)(Array.from(socket.rooms)[1], arg.categories)
-                .then((game) => {
-                    callback(game)
-                })
-                .catch(err => {
-                    callback(ApiError.toProblemDetails(err))
-                })
-        })
     });
 
     return router
