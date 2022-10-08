@@ -2,6 +2,7 @@ const {faker} = require('@faker-js/faker');
 const ApiError = require("./Errors/ApiError");
 const HttpStatusCode = require("./HttpStatusCode");
 const RoomStatus = require("./RoomStatuses");
+const { v4: uuid } = require('uuid');
 
 module.exports = (repository) => ({
     generateRoom: (io) => (host) =>
@@ -85,6 +86,7 @@ const addGame = (repository) => (game) => {
 }
 
 const generateGame = (room, categories) => ({
+    gameId: uuid(),
     roomId: room.roomId,
     numberOfTries: 3,
     categories,

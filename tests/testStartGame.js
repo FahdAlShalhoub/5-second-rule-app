@@ -47,6 +47,7 @@ describe('testStartGame', function () {
     it('Should Return Game Successfully', function (done) {
         RoomManager.startGame(socketManagerSpy)(roomId, ["category1", "category2", "category3"])
             .then((game) => {
+                expect(game).to.have.property("gameId").to.match(new RegExp("^[0-9a-fA-F]{8}\\b-[0-9a-fA-F]{4}\\b-[0-9a-fA-F]{4}\\b-[0-9a-fA-F]{4}\\b-[0-9a-fA-F]{12}$"))
                 expect(game).to.have.property("numberOfTries").to.equal(3)
                 expect(game).to.have.property("categories").to.have.members(["category1", "category2", "category3"])
                 expect(game).to.have.property("currentPlayer").to.have.deep.equal({
