@@ -128,7 +128,7 @@ const startCurrentPlayerTurn = io => repository => game => {
 
 const nextTurn = game => {
     const indexOfCurrentPlayer = game.players.findIndex(player => player.playerId === game.currentPlayer.playerId);
-    const activePlayers = game.players.filter(player => player.remainingTries > player.failedTries.length);
+    const activePlayers = game.players.filter(player => player.remainingTries > 0);
     game.currentPlayer = activePlayers[indexOfCurrentPlayer + 1] || activePlayers[0];
 
     return game;
