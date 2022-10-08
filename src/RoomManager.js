@@ -2,7 +2,7 @@ const {faker} = require('@faker-js/faker');
 const ApiError = require("./Errors/ApiError");
 const HttpStatusCode = require("./HttpStatusCode");
 const RoomStatus = require("./RoomStatuses");
-const { v4: uuid } = require('uuid');
+const {v4: uuid} = require('uuid');
 const RoomEvents = require("./RoomEvents");
 
 module.exports = (repository) => ({
@@ -26,11 +26,7 @@ module.exports = (repository) => ({
             .then(room => ensureRoomExists(room))
             .then(room => ensureRoomHasEnoughPlayers(room))
             .then(room => generateGame(room, categories))
-            .then(game => {
-                const indexOfCurrentPlayer = game.players.findIndex(player => player.playerId === game.currentPlayer.playerId);
-                game.currentPlayer = game.players[indexOfCurrentPlayer + 1];
-                return game;
-            })
+            .then(game => nextTurn(game))
             .then(game => addGame(repository)(game))
             .then(game => emitEventToSocketRoom(io)(RoomEvents.sent.GAME_STARTED, game))
             .then(game => startCurrentPlayerTurn(io)(repository)(game))
@@ -104,5 +100,11 @@ const startCurrentPlayerTurn = io => repository => game => {
     const questions = repository.getAllQuestions()
     const question = questions[Math.floor(Math.random() * questions.length)];
     io.in(game.currentPlayer.playerId).emit(RoomEvents.sent.YOUR_TURN, question.question);
+    return game;
+};
+
+const nextTurn = game => {
+    const indexOfCurrentPlayer = game.players.findIndex(player => player.playerId === game.currentPlayer.playerId);
+    game.currentPlayer = game.players[indexOfCurrentPlayer + 1];
     return game;
 };
