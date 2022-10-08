@@ -112,7 +112,7 @@ const startCurrentPlayerTurn = io => repository => game => {
     const question = questions[Math.floor(Math.random() * questions.length)];
     setTimeout(() => {
         io.in(game.currentPlayer.playerId).emit(RoomEvents.sent.YOUR_TURN, question.question);
-    }, 5000)
+    }, 3000)
     return game;
 };
 
