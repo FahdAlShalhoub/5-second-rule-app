@@ -26,6 +26,11 @@ module.exports = (repository) => ({
             .then(room => ensureRoomExists(room))
             .then(room => ensureRoomHasEnoughPlayers(room))
             .then(room => generateGame(room, categories))
+            .then(game => {
+                const indexOfCurrentPlayer = game.players.findIndex(player => player.playerId === game.currentPlayer.playerId);
+                game.currentPlayer = game.players[indexOfCurrentPlayer + 1];
+                return game;
+            })
             .then(game => addGame(repository)(game))
             .then(game => emitEventToSocketRoom(io)(RoomEvents.sent.GAME_STARTED, game))
             .then(game => startCurrentPlayerTurn(io)(repository)(game))

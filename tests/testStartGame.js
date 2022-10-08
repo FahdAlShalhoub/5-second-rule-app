@@ -51,8 +51,8 @@ describe('testStartGame', function () {
                 expect(game).to.have.property("numberOfTries").to.equal(3)
                 expect(game).to.have.property("categories").to.have.members(["category1", "category2", "category3"])
                 expect(game).to.have.property("currentPlayer").to.have.deep.equal({
-                    playerId: host.hostId,
-                    playerName: host.hostName,
+                    playerId: "ExamplePlayerId",
+                    playerName: "ExamplePlayerName",
                     remainingTries: game.numberOfTries,
                     failedTries: []
                 })
@@ -82,8 +82,8 @@ describe('testStartGame', function () {
                 expect(emitSpy.getCall(0).args[1]).to.have.property("numberOfTries").to.equal(3)
                 expect(emitSpy.getCall(0).args[1]).to.have.property("categories").to.have.members(["category1", "category2", "category3"])
                 expect(emitSpy.getCall(0).args[1]).to.have.property("currentPlayer").to.have.deep.equal({
-                    playerId: host.hostId,
-                    playerName: host.hostName,
+                    playerId: "ExamplePlayerId",
+                    playerName: "ExamplePlayerName",
                     remainingTries: emitSpy.getCall(0).args[1].numberOfTries,
                     failedTries: []
                 })
@@ -106,7 +106,7 @@ describe('testStartGame', function () {
             .catch(err => done(err))
     });
 
-    it('Should Emit your_turn Event To The First Player Successfully', function (done) {
+    it('Should Emit your_turn Event To The Second Player Successfully', function (done) {
         RoomManager.startGame(socketManagerSpy)(roomId, ["category1", "category2", "category3"])
             .then(() => {
                 expect(emitToSocketSpy.getCall(0).args[0]).to.have.equal("your_turn")
@@ -126,8 +126,8 @@ describe('testStartGame', function () {
                 expect(savedGame).to.have.property("numberOfTries").to.equal(3)
                 expect(savedGame).to.have.property("categories").to.have.members(["category1", "category2", "category3"])
                 expect(savedGame).to.have.property("currentPlayer").to.have.deep.equal({
-                    playerId: host.hostId,
-                    playerName: host.hostName,
+                    playerId: "ExamplePlayerId",
+                    playerName: "ExamplePlayerName",
                     remainingTries: savedGame.numberOfTries,
                     failedTries: []
                 })
