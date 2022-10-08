@@ -15,7 +15,7 @@ module.exports = (repository) => ({
 
     joinRoom: (io) => (player, roomId) =>
         repository.getActiveRoomById(roomId)
-            .then(room => ensureRoomExists(room))
+            .then(room => ensureExists(room, "Room Does Not Exist"))
             .then(room => addPlayerToRoom(room, player))
             .then(room => updateRoom(repository)(room))
             .then(room => addPlayerToSocketRoom(io)(player.playerId, room))
@@ -23,7 +23,7 @@ module.exports = (repository) => ({
 
     startGame: (io) => (roomId, categories) =>
         repository.getActiveRoomById(roomId)
-            .then(room => ensureRoomExists(room))
+            .then(room => ensureExists(room, "Room Does Not Exist"))
             .then(room => ensureRoomHasEnoughPlayers(room))
             .then(room => generateGame(room, categories))
             .then(game => nextTurn(game))
@@ -33,18 +33,20 @@ module.exports = (repository) => ({
 
     questionAnswered: (io) => (gameId) =>
         repository.getGameById(gameId)
+            .then(game => ensureExists(game, "Game Does Not Exist"))
             .then(game => nextTurn(game))
             .then(game => startCurrentPlayerTurn(io)(repository)(game))
             .then(game => updateGame(repository)(game)),
 
     timeRanOut: (io) => (gameId, playerId, question) =>
         repository.getGameById(gameId)
+            .then(game => ensureExists(game, "Game Does Not Exist"))
             .then(game => eliminateTryFromCurrentPlayer(game, question))
             .then(game => endGameIfNoMorePlayers(io)(game))
             .then(game => nextTurn(game))
             .then(game => startCurrentPlayerTurn(io)(repository)(game))
             .then(game => updateGame(repository)(game))
-
+            .catch(err => err instanceof Error ? Promise.reject(err) : Promise.resolve(err))
 });
 
 const generateRoom = (host) => {
@@ -62,9 +64,9 @@ const ensureHostHasNoActiveRoom = (existingRoom) => {
     }
 }
 
-const ensureRoomExists = room => {
-    if (!room) throw new ApiError("Room Does Not Exist", HttpStatusCode.BadRequest)
-    return room;
+const ensureExists = (obj, errorMessage) => {
+    if (!obj) throw new ApiError(errorMessage, HttpStatusCode.BadRequest)
+    return obj;
 };
 
 const ensureRoomHasEnoughPlayers = room => {
@@ -144,7 +146,7 @@ const endGameIfNoMorePlayers = io => game => {
     if (activePlayers.length === 1) {
         game.players = game.players.sort((a, b) => (a.remainingTries > b.remainingTries) ? 1 : ((b.remainingTries > a.remainingTries) ? -1 : 0))
         emitEventToSocketRoom(io)(RoomEvents.sent.GAME_FINISHED, game)
-        throw new ApiError("Game Ended", HttpStatusCode.BadRequest)
+        return Promise.reject(game)
     }
 
     return game;
