@@ -95,6 +95,6 @@ const generateGame = (room, categories) => ({
 const startCurrentPlayerTurn = io => repository => game => {
     const questions = repository.getAllQuestions()
     const question = questions[Math.floor(Math.random() * questions.length)];
-    io.in(game.currentPlayer.playerId).emit("your_turn", question);
+    io.in(game.currentPlayer.playerId).emit("your_turn", question.question);
     return game;
 };
