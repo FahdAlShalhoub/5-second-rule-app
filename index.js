@@ -49,6 +49,8 @@ io.on("connection", (socket) => {
     })
 
     socket.on(RoomEvents.received.TIME_RAN_OUT, (arg1, arg2, callback) => {
+        console.log(arg1)
+        console.log(arg2)
         RoomManager.timeRanOut(io)(arg1, Array.from(socket.rooms)[1], arg2)
             .then((game) => {
                 console.log(game)
