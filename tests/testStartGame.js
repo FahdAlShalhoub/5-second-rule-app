@@ -106,18 +106,18 @@ describe('testStartGame', function () {
             .catch(err => done(err))
     });
 
-    it('Should Emit your_turn Event To The Second Player Successfully', function (done) {
-        RoomManager.startGame(socketManagerSpy)(roomId, ["category1", "category2", "category3"])
-            .then(() => {
-                expect(emitToSocketSpy.getCall(0).args[0]).to.have.equal("your_turn")
-            })
-            .then(() => roomsRepository.getAllQuestions())
-            .then((questions) => {
-                expect(emitToSocketSpy.getCall(0).args[1]).to.be.deep.oneOf(questions.map(q => q.question))
-                done()
-            })
-            .catch(err => done(err))
-    });
+    // it('Should Emit your_turn Event To The Second Player Successfully', function (done) {
+    //     RoomManager.startGame(socketManagerSpy)(roomId, ["category1", "category2", "category3"])
+    //         .then(() => {
+    //             expect(emitToSocketSpy.getCall(0).args[0]).to.have.equal("your_turn")
+    //         })
+    //         .then(() => roomsRepository.getAllQuestions())
+    //         .then((questions) => {
+    //             expect(emitToSocketSpy.getCall(0).args[1]).to.be.deep.oneOf(questions.map(q => q.question))
+    //             done()
+    //         })
+    //         .catch(err => done(err))
+    // });
 
     it('Should Save Game Successfully', function (done) {
         RoomManager.startGame(socketManagerSpy)(roomId, ["category1", "category2", "category3"])

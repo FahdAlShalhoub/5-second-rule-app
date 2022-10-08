@@ -29,7 +29,8 @@ module.exports = (repository) => ({
             .then(game => nextTurn(game))
             .then(game => addGame(repository)(game))
             .then(game => emitEventToSocketRoom(io)(RoomEvents.sent.GAME_STARTED, game))
-            .then(game => startCurrentPlayerTurn(io)(repository)(game))
+            .then(game => startCurrentPlayerTurn(io)(repository)(game)),
+
 });
 
 const generateRoom = (host) => {
@@ -99,7 +100,9 @@ const generateGame = (room, categories) => ({
 const startCurrentPlayerTurn = io => repository => game => {
     const questions = repository.getAllQuestions()
     const question = questions[Math.floor(Math.random() * questions.length)];
-    io.in(game.currentPlayer.playerId).emit(RoomEvents.sent.YOUR_TURN, question.question);
+    setTimeout(() => {
+        io.in(game.currentPlayer.playerId).emit(RoomEvents.sent.YOUR_TURN, question.question);
+    }, 1000)
     return game;
 };
 
