@@ -26,14 +26,7 @@ module.exports = (repository) => ({
             .then(room => generateGame(room, categories))
             .then(game => addGame(repository)(game))
             .then(game => emitEventToSocketRoom(io)("game_started", game))
-            .then(game => {
-                repository.getAllQuestions()
-                    .then((questions) => {
-                        const question = questions[Math.floor(Math.random() * questions.length)];
-                        io.in(game.currentPlayer.playerId).emit("your_turn", question);
-                    })
-                return game;
-            })
+            .then(game => startCurrentPlayerTurn(io)(repository)(game))
 });
 
 const generateRoom = (host) => {
@@ -98,3 +91,10 @@ const generateGame = (room, categories) => ({
     currentPlayer: {...room.players[0], remainingTries: 3, failedTries: []},
     players: room.players.map(player => ({...player, remainingTries: 3, failedTries: []}))
 });
+
+const startCurrentPlayerTurn = io => repository => game => {
+    const questions = repository.getAllQuestions()
+    const question = questions[Math.floor(Math.random() * questions.length)];
+    io.in(game.currentPlayer.playerId).emit("your_turn", question);
+    return game;
+};
