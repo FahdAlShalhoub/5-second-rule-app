@@ -55,6 +55,7 @@ io.on("connection", (socket) => {
     })
 
     socket.on(RoomEvents.received.QUESTION_ANSWERED, (arg) => {
+        console.log(arg)
         RoomManager.questionAnswered(io)(arg)
     })
 
