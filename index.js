@@ -7,6 +7,7 @@ const RoomsRouter = require("./src/RoomsRouter");
 const app = express();
 const server = http.createServer(app);
 const ApiError = require("./src/Errors/ApiError");
+const RoomEvents = require("./src/RoomEvents");
 const port = process.env.PORT || 5100;
 const sentryDsn = process.env.SentryDsn
 const redisDbUrl = process.env.RedisDbUrl
@@ -41,14 +42,10 @@ app.use("/v1/room", RoomsRouter(RoomManager, io))
 
 io.on("connection", (socket) => {
     console.log(socket.id)
-    socket.on("start_game", (arg, callback) => {
+    socket.on(RoomEvents.START_GAME, (arg, callback) => {
         RoomManager.startGame(io)(Array.from(socket.rooms)[1], arg.categories)
-            .then((game) => {
-                callback(game)
-            })
-            .catch(err => {
-                callback(ApiError.toProblemDetails(err))
-            })
+            .then((game) => callback(game))
+            .catch(err => callback(ApiError.toProblemDetails(err)))
     })
 });
 
