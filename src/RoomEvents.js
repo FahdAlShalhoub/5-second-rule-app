@@ -3,7 +3,8 @@ module.exports = {
         PLAYER_LEFT: "player_left",
         PLAYER_JOINED: "player_joined",
         GAME_STARTED: "game_started",
-        YOUR_TURN: "your_turn"
+        YOUR_TURN: "your_turn",
+        GAME_FINISHED: "game_finished"
     },
     received: {
         TIME_RAN_OUT: "time_ran_out",

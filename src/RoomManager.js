@@ -37,6 +37,14 @@ module.exports = (repository) => ({
             .then(game => startCurrentPlayerTurn(io)(repository)(game))
             .then(game => updateGame(game)),
 
+    timeRanOut: (io) => (gameId, playerId, question) =>
+        repository.getGameById(gameId)
+            .then(game => eliminateTryFromCurrentPlayer(game, question))
+            .then(game => endGameIfNoMorePlayers(game))
+            .then(game => nextTurn(game))
+            .then(game => startCurrentPlayerTurn(io)(repository)(game))
+            .then(game => updateGame(game))
+
 });
 
 const generateRoom = (host) => {
@@ -118,6 +126,23 @@ const startCurrentPlayerTurn = io => repository => game => {
 
 const nextTurn = game => {
     const indexOfCurrentPlayer = game.players.findIndex(player => player.playerId === game.currentPlayer.playerId);
-    game.currentPlayer = indexOfCurrentPlayer + 1 >= game.players.length ? game.players[0] : game.players[indexOfCurrentPlayer + 1];
+    const activePlayers = game.players.filter(player => player.remainingTries > player.failedTries.length);
+    game.currentPlayer = activePlayers[indexOfCurrentPlayer + 1] || activePlayers[0];
+
     return game;
+};
+
+const eliminateTryFromCurrentPlayer = (game, question) => {
+    const indexOfCurrentPlayer = game.players.findIndex(player => player.playerId === game.currentPlayer.playerId);
+    game.players[indexOfCurrentPlayer].failedTries.push(question)
+    game.players[indexOfCurrentPlayer].remainingTries -= 1
+    return game;
+};
+
+const endGameIfNoMorePlayers = io => game => {
+    const activePlayers = game.players.filter(player => player.remainingTries > player.failedTries.length);
+    if (activePlayers.length === 1) {
+        game.players = game.players.sort((a, b) => (a.remainingTries > b.remainingTries) ? 1 : ((b.remainingTries > a.remainingTries) ? -1 : 0))
+        emitEventToSocketRoom(io)(RoomEvents.sent.GAME_FINISHED, game)
+    }
 };
