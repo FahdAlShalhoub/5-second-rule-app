@@ -10,20 +10,21 @@ describe('testStartGame', function () {
     const roomId = "ExampleRoomId";
     const host = {hostId: "ExampleHostId", hostName: "ExampleHostName"}
     const emitSpy = sinon.spy()
-    const joinSpy = sinon.spy()
+    const emitToSocketSpy = sinon.spy()
     const socketManagerSpy = sinon.spy({
         in: () => ({
-            socketsJoin: joinSpy
+            socketsJoin: emitSpy,
+            emit: emitToSocketSpy
         }),
         to: () => ({
             emit: emitSpy
-        })
+        }),
     });
 
     beforeEach(() => {
         socketManagerSpy.to.resetHistory();
         emitSpy.resetHistory();
-        joinSpy.resetHistory();
+        emitToSocketSpy.resetHistory();
 
         const rooms = [{
             roomId,
@@ -35,7 +36,11 @@ describe('testStartGame', function () {
             }]
         }];
         const games = [];
-        roomsRepository = roomRepositoryFactory(rooms, games)
+        const questions = [{
+            question: "ExampleQuestion",
+            category: "ExampleCategory"
+        }];
+        roomsRepository = roomRepositoryFactory(rooms, games, questions)
         RoomManager = require("../src/RoomManager")(roomsRepository)
     })
 
@@ -95,6 +100,19 @@ describe('testStartGame', function () {
                         failedTries: []
                     }
                 ])
+                done()
+            })
+            .catch(err => done(err))
+    });
+
+    it('Should Emit your_turn Event To The First Player Successfully', function (done) {
+        RoomManager.startGame(socketManagerSpy)(roomId, ["category1", "category2", "category3"])
+            .then(() => {
+                expect(emitToSocketSpy.getCall(0).args[0]).to.have.equal("your_turn")
+            })
+            .then(() => roomsRepository.getAllQuestions())
+            .then((questions) => {
+                expect(emitToSocketSpy.getCall(0).args[1]).to.be.deep.oneOf(questions)
                 done()
             })
             .catch(err => done(err))
