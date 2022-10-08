@@ -114,7 +114,7 @@ describe('testStartGame', function () {
                 const questions = roomsRepository.getAllQuestions()
                 expect(emitToSocketSpy.getCall(0).args[1]).to.be.deep.oneOf(questions.map(q => q.question))
                 done()
-            }, 5000))
+            }, 3000))
             .catch(err => done(err))
     });
 
