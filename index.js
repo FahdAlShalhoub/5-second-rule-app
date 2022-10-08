@@ -42,7 +42,25 @@ app.use("/v1/room", RoomsRouter(RoomManager, io))
 
 io.on("connection", (socket) => {
     console.log(socket.id)
-    socket.on(RoomEvents.START_GAME, (arg, callback) => {
+    socket.on(RoomEvents.received.START_GAME, (arg, callback) => {
+        RoomManager.startGame(io)(Array.from(socket.rooms)[1], arg.categories)
+            .then((game) => callback(game))
+            .catch(err => callback(ApiError.toProblemDetails(err)))
+    })
+
+    socket.on(RoomEvents.received.TIME_RAN_OUT, (arg, callback) => {
+        RoomManager.startGame(io)(Array.from(socket.rooms)[1], arg.categories)
+            .then((game) => callback(game))
+            .catch(err => callback(ApiError.toProblemDetails(err)))
+    })
+
+    socket.on(RoomEvents.received.QUESTION_ANSWERED, (arg, callback) => {
+        RoomManager.startGame(io)(Array.from(socket.rooms)[1], arg.categories)
+            .then((game) => callback(game))
+            .catch(err => callback(ApiError.toProblemDetails(err)))
+    })
+
+    socket.on(RoomEvents.received.KICK_ME, (arg, callback) => {
         RoomManager.startGame(io)(Array.from(socket.rooms)[1], arg.categories)
             .then((game) => callback(game))
             .catch(err => callback(ApiError.toProblemDetails(err)))
