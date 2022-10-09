@@ -29,13 +29,13 @@ module.exports = (repository) => ({
             .then(game => nextTurn(game))
             .then(game => addGame(repository)(game))
             .then(game => emitEventToSocketRoom(io)(RoomEvents.sent.GAME_STARTED, game))
-            .then(game => startCurrentPlayerTurn(io)(repository)(game)),
+            .then(game => startCurrentPlayerTurn(io)(repository)(game, 3000)),
 
     questionAnswered: (io) => (gameId) =>
         repository.getGameById(gameId)
             .then(game => ensureExists(game, "Game Does Not Exist"))
             .then(game => nextTurn(game))
-            .then(game => startCurrentPlayerTurn(io)(repository)(game))
+            .then(game => startCurrentPlayerTurn(io)(repository)(game, 0))
             .then(game => updateGame(repository)(game)),
 
     timeRanOut: (io) => (gameId, playerId, question) =>
@@ -44,7 +44,7 @@ module.exports = (repository) => ({
             .then(game => eliminateTryFromCurrentPlayer(game, question))
             .then(game => endGameIfNoMorePlayers(io)(game))
             .then(game => nextTurn(game))
-            .then(game => startCurrentPlayerTurn(io)(repository)(game))
+            .then(game => startCurrentPlayerTurn(io)(repository)(game, 0))
             .then(game => updateGame(repository)(game))
             .catch(err => err instanceof Error ? Promise.reject(err) : Promise.resolve(err))
 });
@@ -117,12 +117,12 @@ const generateGame = (room, categories) => ({
     players: room.players.map(player => ({...player, remainingTries: 3, failedTries: []}))
 });
 
-const startCurrentPlayerTurn = io => repository => game => {
+const startCurrentPlayerTurn = io => repository => (game, time) => {
     const questions = repository.getAllQuestions()
     const question = questions[Math.floor(Math.random() * questions.length)];
     setTimeout(() => {
         io.in(game.currentPlayer.playerId).emit(RoomEvents.sent.YOUR_TURN, question.question);
-    }, 3000)
+    }, time)
     return game;
 };
 
