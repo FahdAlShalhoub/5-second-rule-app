@@ -11,6 +11,8 @@
   "author": "",
   "license": "ISC",
   "dependencies": {
+    "@agconnect/common-server": "^1.2.0",
+    "@agconnect/database-server": "^1.0.7",
     "@faker-js/faker": "^7.5.0",
     "@sentry/node": "^7.14.1",
     "@sentry/tracing": "^7.14.1",

@@ -12,9 +12,7 @@ const port = process.env.PORT || 5100;
 const sentryDsn = process.env.SentryDsn
 const redisDbUrl = process.env.RedisDbUrl
 const redidDbPassword = process.env.RedisDbPassword
-const roomsRepository = require("./src/Repositories/InMemoryRoomRepository")([], [], [{question: "اذكر اسماء ثلاث شخصيات من باب الحارة", category: "movies"}]);
 const io = require("./src/SocketIoServer")(server, {url: redisDbUrl, password: redidDbPassword});
-const RoomManager = require("./src/RoomManager")(roomsRepository);
 
 Sentry.init({
     dsn: sentryDsn,
@@ -37,54 +35,63 @@ app.use(express.json());
 app.use(Sentry.Handlers.requestHandler());
 app.use(Sentry.Handlers.tracingHandler());
 
-// Routes
-app.use("/v1/room", RoomsRouter(RoomManager, io))
+console.log("Loading Questions Cache...")
+require("./src/Repositories/CloudDbRoomRepository")
+    .getQuestions()
+    .then(questions => {
+        console.log("Loaded Questions Cache Successfully")
+        const roomsRepository = require("./src/Repositories/InMemoryRoomRepository")([], [], questions);
+        const RoomManager = require("./src/RoomManager")(roomsRepository);
 
-io.on("connection", (socket) => {
-    console.log(socket.id)
-    socket.on(RoomEvents.received.START_GAME, (arg, callback) => {
-        RoomManager.startGame(io)(Array.from(socket.rooms)[1], arg)
-            .then((game) => callback(game))
-            .catch(err => callback(ApiError.toProblemDetails(err)))
+        // Routes
+        app.use("/v1/room", RoomsRouter(RoomManager, io))
+
+        io.on("connection", (socket) => {
+            console.log(socket.id)
+            socket.on(RoomEvents.received.START_GAME, (arg, callback) => {
+                RoomManager.startGame(io)(Array.from(socket.rooms)[1], arg)
+                    .then((game) => callback(game))
+                    .catch(err => callback(ApiError.toProblemDetails(err)))
+            })
+
+            socket.on(RoomEvents.received.TIME_RAN_OUT, (arg1, arg2, callback) => {
+                RoomManager.timeRanOut(io)(arg1, Array.from(socket.rooms)[1], arg2)
+                    .then(game => callback(game))
+                    .catch(err => callback(ApiError.toProblemDetails(err)))
+            })
+
+            socket.on(RoomEvents.received.QUESTION_ANSWERED, (arg) => {
+                console.log(arg)
+                RoomManager.questionAnswered(io)(arg)
+            })
+
+            socket.on(RoomEvents.received.KICK_ME, (arg) => {
+                RoomManager.startGame(io)(Array.from(socket.rooms)[1], arg.categories)
+            })
+        });
+
+        app.use(
+            Sentry.Handlers.errorHandler({
+                shouldHandleError(error) {
+                    return error.status === 500;
+                }
+            })
+        );
+
+        app.use((err, req, res, next) => {
+            res.set("Content-Type", "application/problem+json")
+            res.set("Content-Language", "ar")
+
+            if (err instanceof ApiError) {
+                res.status(err.statusCode).send(ApiError.toProblemDetails(err))
+            } else {
+                console.error(err.stack)
+                Sentry.captureException(err);
+                res.status(500).send(ApiError.toProblemDetails({...err, message: "Something Went Wrong"}, res))
+            }
+        })
+
+        server.listen(port, () => {
+            console.log(`Server Started At Port: ${port}`);
+        });
     })
-
-    socket.on(RoomEvents.received.TIME_RAN_OUT, (arg1, arg2, callback) => {
-        RoomManager.timeRanOut(io)(arg1, Array.from(socket.rooms)[1], arg2)
-            .then(game => callback(game))
-            .catch(err => callback(ApiError.toProblemDetails(err)))
-    })
-
-    socket.on(RoomEvents.received.QUESTION_ANSWERED, (arg) => {
-        console.log(arg)
-        RoomManager.questionAnswered(io)(arg)
-    })
-
-    socket.on(RoomEvents.received.KICK_ME, (arg) => {
-        RoomManager.startGame(io)(Array.from(socket.rooms)[1], arg.categories)
-    })
-});
-
-app.use(
-    Sentry.Handlers.errorHandler({
-        shouldHandleError(error) {
-            return error.status === 500;
-        }
-    })
-);
-
-app.use((err, req, res, next) => {
-    res.set("Content-Type", "application/problem+json")
-    res.set("Content-Language", "ar")
-
-    if (err instanceof ApiError) {
-        res.status(err.statusCode).send(ApiError.toProblemDetails(err))
-    } else {
-        console.error(err.stack)
-        Sentry.captureException(err);
-        res.status(500).send(ApiError.toProblemDetails({...err, message: "Something Went Wrong"}, res))
-    }
-})
-
-server.listen(port, () => {
-    console.log(`Server Started At Port: ${port}`);
-});
