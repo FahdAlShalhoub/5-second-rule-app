@@ -49,6 +49,7 @@ require("./src/Repositories/CloudDbRoomRepository")
         io.on("connection", (socket) => {
             console.log(socket.id)
             socket.on(RoomEvents.received.START_GAME, (arg, callback) => {
+                console.log(arg)
                 RoomManager.startGame(io)(Array.from(socket.rooms)[1], arg)
                     .then((game) => callback(game))
                     .catch(err => callback(ApiError.toProblemDetails(err)))
