@@ -48,7 +48,14 @@ module.exports = (repository) => ({
             .then(game => nextTurn(game))
             .then(game => startCurrentPlayerTurn(io)(repository)(game, 0))
             .then(game => updateGame(repository)(game))
-            .catch(err => err instanceof Error ? Promise.reject(err) : Promise.resolve(err))
+            .catch(err => {
+                if(err instanceof Error) {
+                    Promise.reject(err)
+                } else {
+                    const {categories, ...rest} = err
+                    Promise.resolve(rest)
+                }
+            })
 });
 
 const generateRoom = (host) => {
