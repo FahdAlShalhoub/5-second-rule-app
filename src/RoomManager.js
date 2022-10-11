@@ -29,14 +29,16 @@ module.exports = (repository) => ({
             .then(game => nextTurn(game))
             .then(game => addGame(repository)(game))
             .then(game => emitEventToSocketRoom(io)(RoomEvents.sent.GAME_STARTED, game))
-            .then(game => startCurrentPlayerTurn(io)(repository)(game, 3000)),
+            .then(game => startCurrentPlayerTurn(io)(repository)(game, 3000))
+            .then(({categories, ...rest}) => rest),
 
     questionAnswered: (io) => (gameId) =>
         repository.getGameById(gameId)
             .then(game => ensureExists(game, "Game Does Not Exist"))
             .then(game => nextTurn(game))
             .then(game => startCurrentPlayerTurn(io)(repository)(game, 0))
-            .then(game => updateGame(repository)(game)),
+            .then(game => updateGame(repository)(game))
+            .then(({categories, ...rest}) => rest),
 
     timeRanOut: (io) => (gameId, playerId, question) =>
         repository.getGameById(gameId)
@@ -82,9 +84,15 @@ const addPlayerToRoom = (room, player) => {
     };
 };
 
-const emitEventToSocketRoom = (socketManager) => (eventName, room) => {
-    socketManager.to(room.roomId).emit(eventName, room)
-    return room
+const emitEventToSocketRoom = (socketManager) => (eventName, obj) => {
+    if (obj.categories) {
+        const { categories, ...rest } = obj;
+        socketManager.to(obj.roomId).emit(eventName, rest)
+    } else {
+        socketManager.to(obj.roomId).emit(eventName, obj)
+    }
+
+    return obj
 }
 
 const addPlayerToSocketRoom = (socketManager) => (socketId, room) => {
@@ -145,8 +153,9 @@ const endGameIfNoMorePlayers = io => game => {
     const activePlayers = game.players.filter(player => player.remainingTries > 0);
     if (activePlayers.length === 1) {
         game.players = game.players.sort((a, b) => (a.remainingTries > b.remainingTries) ? -1 : ((b.remainingTries > a.remainingTries) ? 1 : 0))
+        const {categories, ...rest} = game;
         emitEventToSocketRoom(io)(RoomEvents.sent.GAME_FINISHED, game)
-        return Promise.reject(game)
+        return Promise.reject(rest)
     }
 
     return game;
