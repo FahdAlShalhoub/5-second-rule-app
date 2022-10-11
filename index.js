@@ -50,7 +50,14 @@ require("./src/Repositories/CloudDbRoomRepository")
             console.log(socket.id)
             socket.on(RoomEvents.received.START_GAME, (arg, callback) => {
                 console.log(arg)
-                RoomManager.startGame(io)(Array.from(socket.rooms)[1], arg)
+                const p = arg.split(",")
+
+                const firstElement = p.shift().replace("[", "")
+                const lastElement = p.pop().replace("]", "")
+
+                const categories = [firstElement, ...p.map(str => str.trim()), lastElement]
+
+                RoomManager.startGame(io)(Array.from(socket.rooms)[1], categories)
                     .then((game) => callback(game))
                     .catch(err => callback(ApiError.toProblemDetails(err)))
             })
