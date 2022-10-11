@@ -49,7 +49,7 @@ describe('testStartGame', function () {
             .then((game) => {
                 expect(game).to.have.property("gameId").to.match(new RegExp("^[0-9a-fA-F]{8}\\b-[0-9a-fA-F]{4}\\b-[0-9a-fA-F]{4}\\b-[0-9a-fA-F]{4}\\b-[0-9a-fA-F]{12}$"))
                 expect(game).to.have.property("numberOfTries").to.equal(3)
-                expect(game).to.not.have.property("categories")
+                expect(game).to.have.property("categories").to.have.members(["category1", "category2", "category3"])
                 expect(game).to.have.property("currentPlayer").to.have.deep.equal({
                     playerId: "ExamplePlayerId",
                     playerName: "ExamplePlayerName",
@@ -80,7 +80,7 @@ describe('testStartGame', function () {
             .then(() => {
                 expect(emitSpy.getCall(0).args[0]).to.have.equal("game_started")
                 expect(emitSpy.getCall(0).args[1]).to.have.property("numberOfTries").to.equal(3)
-                expect(emitSpy.getCall(0).args[1]).to.not.have.property("categories")
+                expect(emitSpy.getCall(0).args[1]).to.have.property("categories").to.have.members(["category1", "category2", "category3"])
                 expect(emitSpy.getCall(0).args[1]).to.have.property("currentPlayer").to.have.deep.equal({
                     playerId: "ExamplePlayerId",
                     playerName: "ExamplePlayerName",
