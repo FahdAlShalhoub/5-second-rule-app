@@ -48,8 +48,9 @@ module.exports = (repository) => ({
             .then(game => nextTurn(game))
             .then(game => startCurrentPlayerTurn(io)(repository)(game, 0))
             .then(game => updateGame(repository)(game))
+            .then(({categories, ...rest}) => rest)
             .catch(err => {
-                if(err instanceof Error) {
+                if (err instanceof Error) {
                     Promise.reject(err)
                 } else {
                     const {categories, ...rest} = err
@@ -93,7 +94,7 @@ const addPlayerToRoom = (room, player) => {
 
 const emitEventToSocketRoom = (socketManager) => (eventName, obj) => {
     if (obj.categories) {
-        const { categories, ...rest } = obj;
+        const {categories, ...rest} = obj;
         socketManager.to(obj.roomId).emit(eventName, rest)
     } else {
         socketManager.to(obj.roomId).emit(eventName, obj)
