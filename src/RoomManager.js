@@ -161,7 +161,7 @@ const endGameIfNoMorePlayers = io => game => {
     if (activePlayers.length === 1) {
         game.players = game.players.sort((a, b) => (a.remainingTries > b.remainingTries) ? -1 : ((b.remainingTries > a.remainingTries) ? 1 : 0))
         const {categories, ...rest} = game;
-        emitEventToSocketRoom(io)(RoomEvents.sent.GAME_FINISHED, game)
+        emitEventToSocketRoom(io)(RoomEvents.sent.GAME_FINISHED, rest)
         return Promise.reject(rest)
     }
 
