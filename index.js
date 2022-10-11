@@ -66,7 +66,7 @@ require("./src/Repositories/CloudDbRoomRepository")
             })
 
             socket.on(RoomEvents.received.KICK_ME, (arg) => {
-                RoomManager.startGame(io)(Array.from(socket.rooms)[1], arg.categories)
+                RoomManager.startGame(io)(Array.from(socket.rooms)[1], arg)
             })
         });
 
