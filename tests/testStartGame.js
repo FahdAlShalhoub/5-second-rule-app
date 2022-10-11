@@ -38,7 +38,7 @@ describe('testStartGame', function () {
         const games = [];
         const questions = [{
             question: "ExampleQuestion",
-            category: "ExampleCategory"
+            category: "category1"
         }];
         roomsRepository = roomRepositoryFactory(rooms, games, questions)
         RoomManager = require("../src/RoomManager")(roomsRepository)
