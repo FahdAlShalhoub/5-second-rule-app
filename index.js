@@ -8,11 +8,12 @@ const app = express();
 const server = http.createServer(app);
 const ApiError = require("./src/Errors/ApiError");
 const RoomEvents = require("./src/RoomEvents");
+const GameEvents = require("./src/GameEvents");
 const port = process.env.PORT || 5100;
 const sentryDsn = process.env.SentryDsn
 const redisDbUrl = process.env.RedisDbUrl
 const redidDbPassword = process.env.RedisDbPassword
-const io = require("./src/SocketIoServer")(server, {url: redisDbUrl, password: redidDbPassword});
+const io = require("./src/SocketIoServer").startServer(server, {url: redisDbUrl, password: redidDbPassword});
 
 Sentry.init({
     dsn: sentryDsn,
@@ -42,6 +43,7 @@ require("./src/Repositories/CloudDbRoomRepository")
         console.log("Loaded Questions Cache Successfully")
         const roomsRepository = require("./src/Repositories/InMemoryRoomRepository")([], [], questions);
         const RoomManager = require("./src/RoomManager")(roomsRepository);
+        const GameSession = require("./src/GameSession")(roomsRepository);
 
         // Routes
         app.use("/v1/room", RoomsRouter(RoomManager, io))
@@ -66,24 +68,24 @@ require("./src/Repositories/CloudDbRoomRepository")
                     categories = [x]
                 }
 
-                RoomManager.startGame(io)(Array.from(socket.rooms)[1], categories)
+                RoomManager.initiateGame(io)(Array.from(socket.rooms)[1], categories)
                     .then((game) => callback(game))
                     .catch(err => callback(ApiError.toProblemDetails(err)))
             })
 
-            socket.on(RoomEvents.received.TIME_RAN_OUT, (arg1, arg2, callback) => {
-                RoomManager.timeRanOut(io)(arg1, Array.from(socket.rooms)[1], arg2)
+            socket.on(GameEvents.received.TIME_RAN_OUT, (arg1, arg2, callback) => {
+                GameSession.timeRanOut(io)(arg1, Array.from(socket.rooms)[1], arg2)
                     .then(game => callback(game))
                     .catch(err => callback(ApiError.toProblemDetails(err)))
             })
 
-            socket.on(RoomEvents.received.QUESTION_ANSWERED, (arg) => {
+            socket.on(GameEvents.received.QUESTION_ANSWERED, (arg) => {
                 console.log(arg)
-                RoomManager.questionAnswered(io)(arg)
+                GameSession.questionAnswered(io)(arg)
             })
 
             socket.on(RoomEvents.received.KICK_ME, (arg) => {
-                RoomManager.startGame(io)(Array.from(socket.rooms)[1], arg)
+                RoomManager.initiateGame(io)(Array.from(socket.rooms)[1], arg)
             })
         });
 

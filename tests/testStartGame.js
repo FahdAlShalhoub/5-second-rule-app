@@ -6,7 +6,7 @@ describe('testStartGame', function () {
     it('Should Return Game Successfully', function (done) {
         const {roomManager, socketManagerSpy, roomId, host} = setup({rooms: [setupRoom({})]});
 
-        roomManager.startGame(socketManagerSpy)(roomId, ["category1", "category2", "category3"])
+        roomManager.initiateGame(socketManagerSpy)(roomId, ["category1", "category2", "category3"])
             .then((game) => {
                 expect(game).to.have.property("gameId").to.match(new RegExp("^[0-9a-fA-F]{8}\\b-[0-9a-fA-F]{4}\\b-[0-9a-fA-F]{4}\\b-[0-9a-fA-F]{4}\\b-[0-9a-fA-F]{12}$"))
                 expect(game).to.have.property("numberOfTries").to.equal(3)
@@ -39,7 +39,7 @@ describe('testStartGame', function () {
     it('Should Emit Game Started Event Successfully', function (done) {
         const {roomManager, socketManagerSpy, roomId, host, emitSpy} = setup({rooms: [setupRoom({})]});
 
-        roomManager.startGame(socketManagerSpy)(roomId, ["category1", "category2", "category3"])
+        roomManager.initiateGame(socketManagerSpy)(roomId, ["category1", "category2", "category3"])
             .then(() => {
                 expect(emitSpy.getCall(0).args[0]).to.have.equal("game_started")
                 expect(emitSpy.getCall(0).args[1]).to.have.property("numberOfTries").to.equal(3)
@@ -84,7 +84,7 @@ describe('testStartGame', function () {
     it('Should Save Game Successfully', function (done) {
         const {roomManager, roomsRepository, socketManagerSpy, roomId, host} = setup({rooms: [setupRoom({})]});
 
-        roomManager.startGame(socketManagerSpy)(roomId, ["category1", "category2", "category3"])
+        roomManager.initiateGame(socketManagerSpy)(roomId, ["category1", "category2", "category3"])
             .then(() => roomsRepository.getGameByRoomId(roomId))
             .then((savedGame) => {
                 expect(savedGame).to.have.property("numberOfTries").to.equal(3)
@@ -117,7 +117,7 @@ describe('testStartGame', function () {
     it('Should Throw Error If Room Does Not Exist', function (done) {
         const {roomManager, socketManagerSpy, roomId} = setup({});
 
-        roomManager.startGame(socketManagerSpy)(roomId, [])
+        roomManager.initiateGame(socketManagerSpy)(roomId, [])
             .then(() => done(new Error("Did Not Throw Error")))
             .catch(err => {
                 expect(err).to.be.instanceof(ApiError)
@@ -135,7 +135,7 @@ describe('testStartGame', function () {
             rooms: [setupRoom({players: [setupPlayer()]})]
         });
 
-        roomManager.startGame(socketManagerSpy)(roomId, ["category1", "category2", "category3"])
+        roomManager.initiateGame(socketManagerSpy)(roomId, ["category1", "category2", "category3"])
             .then(() => done(new Error("Did Not Throw Error")))
             .catch(err => {
                 expect(err).to.be.instanceof(ApiError)
