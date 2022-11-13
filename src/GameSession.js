@@ -5,7 +5,6 @@ const {v4: uuid} = require("uuid");
 const GameEvents = require("./GameEvents");
 
 module.exports = (repository) => ({
-    // Player In Turn Answers Question
     questionAnswered: (io) => (gameId) =>
         repository.getGameById(gameId)
             .then(game => ensureExists(game, "Game Does Not Exist"))
@@ -13,7 +12,6 @@ module.exports = (repository) => ({
             .then(game => startCurrentPlayerTurn(io)(repository)(game, 0))
             .then(game => updateGame(repository)(game)),
 
-    // Player In Turn Fails To Answer Question
     timeRanOut: (io) => (gameId, playerId, question) =>
         repository.getGameById(gameId)
             .then(game => ensureExists(game, "Game Does Not Exist"))
