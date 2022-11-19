@@ -5,6 +5,13 @@ const {v4: uuid} = require("uuid");
 const GameEvents = require("./GameEvents");
 
 module.exports = (repository) => ({
+    startGame: (io) => (room, categories) =>
+        new Promise((resolve) => resolve(generateGame(room, categories)))
+            .then(game => nextTurn(game))
+            .then(game => addGame(repository)(game))
+            .then(game => notifyPlayersThatTheGameStarted(io)(game))
+            .then(game => startCurrentPlayerTurn(io)(repository)(game, 3000)),
+
     questionAnswered: (io) => (gameId) =>
         repository.getGameById(gameId)
             .then(game => ensureExists(game, "Game Does Not Exist"))
@@ -21,13 +28,6 @@ module.exports = (repository) => ({
             .then(game => startCurrentPlayerTurn(io)(repository)(game, 0))
             .then(game => updateGame(repository)(game))
             .catch(err => err instanceof Error ? Promise.reject(err) : Promise.resolve(err)),
-
-    startGame: (io) => (room, categories) =>
-        new Promise((resolve) => resolve(generateGame(room, categories)))
-            .then(game => nextTurn(game))
-            .then(game => addGame(repository)(game))
-            .then(game => notifyPlayersThatTheGameStarted(io)(game))
-            .then(game => startCurrentPlayerTurn(io)(repository)(game, 3000)),
 });
 
 const ensureExists = (obj, errorMessage) => {
@@ -78,14 +78,18 @@ const addGame = (repository) => (game) => {
     return repository.addGame(game)
 }
 
-const generateGame = (room, categories) => ({
-    gameId: uuid(),
-    roomId: room.roomId,
-    numberOfTries: 3,
-    categories,
-    currentPlayer: {...room.players[0], remainingTries: 3, failedTries: []},
-    players: room.players.map(player => ({...player, remainingTries: 3, failedTries: []}))
-});
+const generateGame = (room, categories) => {
+    const numberOfTries = 3;
+
+    return {
+        gameId: uuid(),
+        roomId: room.roomId,
+        numberOfTries: numberOfTries,
+        categories,
+        currentPlayer: {...room.players[0], remainingTries: numberOfTries, failedTries: []},
+        players: room.players.map(player => ({...player, remainingTries: numberOfTries, failedTries: []}))
+    }
+};
 
 const notifyPlayersThatTheGameStarted = (socketManager) => (game) => {
     SocketIoServer.emitEventToSocketRoom(socketManager)(GameEvents.sent.GAME_STARTED, game)

@@ -42,11 +42,35 @@ module.exports = {
         }
     },
 
+    setupInGamePlayer() {
+        return {
+            playerId: "ExamplePlayerId",
+            playerName: "ExamplePlayerName",
+            remainingTries: 3,
+            failedTries: []
+        }
+    },
+
     setupHostPlayer() {
         return {
             ...module.exports.setupPlayer(),
             playerId: module.exports.host.hostId,
             playerName: module.exports.host.hostName
+        }
+    },
+
+    setupGame({players, currentPlayer}) {
+        return {
+            gameId: "ExampleGameId",
+            roomId: "ExampleRoomId",
+            numberOfTries: 3,
+            categories: ["category"],
+            currentPlayer: currentPlayer || {playerId: "ExampleHostId", remainingTries: 3, failedTries: []},
+            players: players || [{playerId: "ExampleHostId", remainingTries: 3, failedTries: []}, {
+                playerId: "ExamplePlayerId",
+                remainingTries: 3,
+                failedTries: []
+            }]
         }
     },
 
