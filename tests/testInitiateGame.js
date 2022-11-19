@@ -2,7 +2,7 @@ const ApiError = require("../src/Errors/ApiError");
 const expect = require("chai").expect;
 const {setup, setupRoom, setupPlayer} = require("./setups");
 
-describe('testStartGame', function () {
+describe('testInitiateGame', function () {
     it('Should Return Game Successfully', function (done) {
         const {roomManager, socketManagerSpy, roomId, host} = setup({rooms: [setupRoom({})]});
 
@@ -71,7 +71,7 @@ describe('testStartGame', function () {
 
     // it('Should Emit your_turn Event To The Second Player Successfully', function (done) {
     //     this.timeout(4000);
-    //     RoomManager.startGame(socketManagerSpy)(roomId, ["category1", "category2", "category3"])
+    //     RoomManager.InitiateGame(socketManagerSpy)(roomId, ["category1", "category2", "category3"])
     //         .then(() => setTimeout(() => {
     //             expect(emitToSocketSpy.getCall(0).args[0]).to.have.equal("your_turn")
     //             const questions = roomsRepository.getAllQuestions()
