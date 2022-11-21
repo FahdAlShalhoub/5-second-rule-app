@@ -23,6 +23,10 @@ module.exports = {
 
     addClientToSocketRoom: (socketManager) => (socketId, roomId) => {
         socketManager.in(socketId).socketsJoin(roomId)
+    },
+
+    emitEventToClient: (socketManager) => (clientId, eventName, message) => {
+        socketManager.in(clientId).emit(eventName, message);
     }
 }
 
