@@ -26,7 +26,7 @@ module.exports = (repository) => ({
         repository.getActiveRoomById(roomId)
             .then(room => ensureExists(room, "Room Does Not Exist"))
             .then(room => ensureRoomHasEnoughPlayers(room))
-            .then(room => GameSession(repository).startGame(io)(room, categories))
+            .then(room => GameSession(repository)(io).startGame(room, categories))
 });
 
 const generateRoom = (host) => {

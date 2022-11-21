@@ -41,12 +41,12 @@ describe('testTimeRanOut', function () {
             question: "ExampleQuestion",
             category: "category"
         }])
-        GameSession = GameSessionFactory(roomsRepository)
+        GameSession = GameSessionFactory(roomsRepository)(socketManagerSpy)
     })
 
     it('Should Return Game Object With Player Having a Failed Try Successfully', function (done) {
         GameSession
-            .timeRanOut(socketManagerSpy)(gameId, "ExampleHostId", "ExampleQuestion")
+            .timeRanOut(gameId, "ExampleHostId", "ExampleQuestion")
             .then((game) => {
                 expect(game.players[0]).to.have.property("failedTries").have.members(["ExampleQuestion"])
                 expect(game.players[0].remainingTries).to.equal(2)
@@ -57,7 +57,7 @@ describe('testTimeRanOut', function () {
 
     it('Should Save Game Having a Player With a Failed Try Successfully', function (done) {
         GameSession
-            .timeRanOut(socketManagerSpy)(gameId, "ExampleHostId", "ExampleQuestion")
+            .timeRanOut(gameId, "ExampleHostId", "ExampleQuestion")
             .then(() => roomsRepository.getGameById(gameId))
             .then((game) => {
                 expect(game.players[0]).to.have.property("failedTries").have.members(["ExampleQuestion"])
@@ -76,8 +76,8 @@ describe('testTimeRanOut', function () {
                 setupGame({players: [player1, player2], currentPlayer: player2})
             ]});
 
-        GameSessionFactory(roomsRepository)
-            .timeRanOut(socketManagerSpy)(gameId, player2.playerId, "ExampleQuestion")
+        GameSessionFactory(roomsRepository)(socketManagerSpy)
+            .timeRanOut(gameId, player2.playerId, "ExampleQuestion")
             .then(() => {
                 expect(socketManagerSpy.to().emit.calledOnce).to.be.true;
                 expect(socketManagerSpy.to().emit.args[0][0]).to.equal(GameEvents.sent.GAME_FINISHED);
@@ -90,7 +90,7 @@ describe('testTimeRanOut', function () {
 
     it('Should Pass Turn To Next Player Successfully', function (done) {
         GameSession
-            .timeRanOut(socketManagerSpy)(gameId, "ExampleHostId", "ExampleQuestion")
+            .timeRanOut(gameId, "ExampleHostId", "ExampleQuestion")
             .then(() => roomsRepository.getGameById(gameId))
             .then((game) => {
                 expect(game.currentPlayer.playerId).to.equal("ExamplePlayerId")
@@ -104,8 +104,8 @@ describe('testTimeRanOut', function () {
             roomsRepository
         } = setup({});
 
-        GameSessionFactory(roomsRepository)
-            .timeRanOut(socketManagerSpy)("", "", "")
+        GameSessionFactory(roomsRepository)(socketManagerSpy)
+            .timeRanOut("", "", "")
             .then(() => done("Error Failed To Throw"))
             .catch((err) => {
                 expect(err.message).to.equal("Game Does Not Exist")

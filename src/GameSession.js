@@ -4,22 +4,22 @@ const SocketIoServer = require("./SocketIoServer");
 const {v4: uuid} = require("uuid");
 const GameEvents = require("./GameEvents");
 
-module.exports = (repository) => ({
-    startGame: (io) => (room, categories) =>
+module.exports = (repository) => (io) => ({
+    startGame: (room, categories) =>
         new Promise((resolve) => resolve(generateGame(room, categories)))
             .then(game => nextTurn(game))
             .then(game => addGame(repository)(game))
             .then(game => notifyPlayersThatTheGameStarted(io)(game))
             .then(game => startCurrentPlayerTurn(io)(repository)(game, 3000)),
 
-    questionAnswered: (io) => (gameId) =>
+    questionAnswered: (gameId) =>
         repository.getGameById(gameId)
             .then(game => ensureExists(game, "Game Does Not Exist"))
             .then(game => nextTurn(game))
             .then(game => startCurrentPlayerTurn(io)(repository)(game, 0))
             .then(game => updateGame(repository)(game)),
 
-    timeRanOut: (io) => (gameId, playerId, question) =>
+    timeRanOut: (gameId, playerId, question) =>
         repository.getGameById(gameId)
             .then(game => ensureExists(game, "Game Does Not Exist"))
             .then(game => eliminateTryFromCurrentPlayer(game, question))
