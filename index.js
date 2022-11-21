@@ -9,6 +9,7 @@ const server = http.createServer(app);
 const ApiError = require("./src/Errors/ApiError");
 const RoomEvents = require("./src/RoomEvents");
 const GameEvents = require("./src/GameEvents");
+const {parseCategories} = require("./src/Utils");
 const port = process.env.PORT || 5100;
 const sentryDsn = process.env.SentryDsn
 const redisDbUrl = process.env.RedisDbUrl
@@ -49,39 +50,21 @@ require("./src/Repositories/CloudDbRoomRepository")
         app.use("/v1/room", RoomsRouter(RoomManager, io))
 
         io.on("connection", (socket) => {
-            console.log(socket.id)
             socket.on(RoomEvents.received.START_GAME, (arg, callback) => {
-                console.log(arg)
-                let x = arg
-                let categories;
-                x = x.replace("]", "")
-                x = x.replace("[", "")
-
-                const p = arg.split(",")
-
-                if(p.length !== 1) {
-                    const firstElement = p.shift().trim()
-                    const lastElement = p.pop().trim()
-
-                    categories = [firstElement, ...p.map(str => str.trim()), lastElement]
-                } else {
-                    categories = [x]
-                }
-
-                RoomManager.initiateGame(io)(Array.from(socket.rooms)[1], categories)
+                RoomManager.initiateGame(io)(Array.from(socket.rooms)[1], parseCategories(arg))
                     .then((game) => callback(game))
                     .catch(err => callback(ApiError.toProblemDetails(err)))
             })
 
             socket.on(GameEvents.received.TIME_RAN_OUT, (arg1, arg2, callback) => {
-                GameSession.timeRanOut(io)(arg1, Array.from(socket.rooms)[1], arg2)
+                GameSession(io).timeRanOut(arg1, Array.from(socket.rooms)[1], arg2)
                     .then(game => callback(game))
                     .catch(err => callback(ApiError.toProblemDetails(err)))
             })
 
             socket.on(GameEvents.received.QUESTION_ANSWERED, (arg) => {
                 console.log(arg)
-                GameSession.questionAnswered(io)(arg)
+                GameSession(io).questionAnswered(arg)
             })
 
             socket.on(RoomEvents.received.KICK_ME, (arg) => {
