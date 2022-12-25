@@ -18,6 +18,7 @@ const io = require("./src/SocketIoServer").startServer(server, {url: redisDbUrl,
 
 Sentry.init({
     dsn: sentryDsn,
+
     environment: process.env.NODE_ENV,
     integrations: [
         // enable HTTP calls tracing
