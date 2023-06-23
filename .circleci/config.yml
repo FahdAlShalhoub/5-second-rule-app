@@ -27,8 +27,8 @@ jobs:
           name: Run YARN tests
           
   deploy:
-    docker:
-      - image: circleci/node@5.0.2
+    executor: 
+      name: node/default
     steps:
       - checkout
       - run:
