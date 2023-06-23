@@ -4,7 +4,7 @@ orbs:
   
 jobs:
   build:
-    executor: node
+    executor: node/default
     steps:
       - checkout
       - node/install-packages:
@@ -12,9 +12,6 @@ jobs:
       - run:
           command: npm run test
           name: Run tests
-      - run:
-          command: npm run build
-          name: Build app
       - persist_to_workspace:
           root: ~/project
           paths:
@@ -35,6 +32,10 @@ workflows:
   sample:
     jobs:
       - build
+      - node/test:
+          test-results-path: junit.xml
+          requires:
+            - build
       - deploy:
           requires:
             - build
