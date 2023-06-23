@@ -4,7 +4,9 @@ orbs:
   
 jobs:
   build:
-    executor: node/default
+    executor: 
+      name: node/default
+      tag: '16'
     steps:
       - checkout
       - node/install-packages:
@@ -13,7 +15,18 @@ jobs:
           root: ~/project
           paths:
             - .
-  
+    test:
+      executor:
+        name: node/default
+        tag: '16'
+      steps:
+        - checkout
+        - node/install-packages:
+            pkg-manager: yarn
+        - run:
+            command: yarn run test
+            name: Run YARN tests
+            
   deploy:
     docker:
       - image: circleci/node@5.0.2
@@ -29,10 +42,9 @@ workflows:
   sample:
     jobs:
       - build
-      - node/test:
-          test-results-path: junit.xml
+      - test:
           requires:
             - build
       - deploy:
           requires:
-            - node/test
+            - test
