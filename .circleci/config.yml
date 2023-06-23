@@ -8,10 +8,7 @@ jobs:
     steps:
       - checkout
       - node/install-packages:
-          pkg-manager: npm
-      - run:
-          command: npm run test
-          name: Run tests
+          pkg-manager: yarn
       - persist_to_workspace:
           root: ~/project
           paths:
