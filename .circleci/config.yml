@@ -15,18 +15,19 @@ jobs:
           root: ~/project
           paths:
             - .
-    test:
-      executor:
-        name: node/default
-        tag: '16'
-      steps:
-        - checkout
-        - node/install-packages:
-            pkg-manager: yarn
-        - run:
-            command: yarn run test
-            name: Run YARN tests
-            
+  
+  test:
+    executor:
+      name: node/default
+      tag: '16'
+    steps:
+      - checkout
+      - node/install-packages:
+          pkg-manager: yarn
+      - run:
+          command: yarn run test
+          name: Run YARN tests
+          
   deploy:
     docker:
       - image: circleci/node@5.0.2
