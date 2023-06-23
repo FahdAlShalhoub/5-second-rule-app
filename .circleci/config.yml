@@ -1,0 +1,49 @@
+version: 2.1
+orbs:
+  node: circleci/node@5.1.0
+  
+jobs:
+  build:
+    executor: 
+      name: node/default
+    steps:
+      - checkout
+      - node/install-packages:
+          pkg-manager: yarn
+      - persist_to_workspace:
+          root: ~/project
+          paths:
+            - .
+  
+  test:
+    executor:
+      name: node/default
+    steps:
+      - checkout
+      - node/install-packages:
+          pkg-manager: yarn
+      - run:
+          command: yarn run test
+          name: Run YARN tests
+          
+  deploy:
+    executor: 
+      name: node/default
+    steps:
+      - checkout
+      - run:
+          name: Deploy Fly
+          command: |
+            wget -qO- 'https://getfly.fly.dev/linux-x86-64/flyctl.tgz' | tar xz
+            ./flyctl deploy -t $FLY_AUTH_TOKEN --build-arg RedisDbUrl=$REDIS_URL --build-arg RedisDbPassword=$REDIS_PASSWORD --build-arg CloudDBConfig=$DB_CONFIG  
+
+workflows:
+  sample:
+    jobs:
+      - build
+      - test:
+          requires:
+            - build
+      - deploy:
+          requires:
+            - test

@@ -1,7 +1,7 @@
 const express = require('express');
 const http = require('http');
-const Sentry = require("@sentry/node");
-const Tracing = require("@sentry/tracing");
+// const Sentry = require("@sentry/node");
+// const Tracing = require("@sentry/tracing");
 const RoomsRouter = require("./src/RoomsRouter");
 
 const app = express();
@@ -11,32 +11,32 @@ const RoomEvents = require("./src/RoomEvents");
 const GameEvents = require("./src/GameEvents");
 const {parseCategories} = require("./src/Utils");
 const port = process.env.PORT || 5100;
-const sentryDsn = process.env.SentryDsn
+// const sentryDsn = process.env.SentryDsn
 const redisDbUrl = process.env.RedisDbUrl
 const redidDbPassword = process.env.RedisDbPassword
 const io = require("./src/SocketIoServer").startServer(server, {url: redisDbUrl, password: redidDbPassword});
 
-Sentry.init({
-    dsn: sentryDsn,
-
-    environment: process.env.NODE_ENV,
-    integrations: [
-        // enable HTTP calls tracing
-        new Sentry.Integrations.Http({ tracing: true }),
-        // enable Express.js middleware tracing
-        new Tracing.Integrations.Express({ app }),
-    ],
-
-    // Set tracesSampleRate to 1.0 to capture 100%
-    // of transactions for performance monitoring.
-    // We recommend adjusting this value in production
-    tracesSampleRate: 1.0,
-});
+// Sentry.init({
+//     dsn: sentryDsn,
+//
+//     environment: process.env.NODE_ENV,
+//     integrations: [
+//         // enable HTTP calls tracing
+//         new Sentry.Integrations.Http({ tracing: true }),
+//         // enable Express.js middleware tracing
+//         new Tracing.Integrations.Express({ app }),
+//     ],
+//
+//     // Set tracesSampleRate to 1.0 to capture 100%
+//     // of transactions for performance monitoring.
+//     // We recommend adjusting this value in production
+//     tracesSampleRate: 1.0,
+// });
 
 //Middleware
 app.use(express.json());
-app.use(Sentry.Handlers.requestHandler());
-app.use(Sentry.Handlers.tracingHandler());
+// app.use(Sentry.Handlers.requestHandler());
+// app.use(Sentry.Handlers.tracingHandler());
 
 console.log("Loading Questions Cache...")
 require("./src/Repositories/CloudDbRoomRepository")
@@ -73,13 +73,13 @@ require("./src/Repositories/CloudDbRoomRepository")
             })
         });
 
-        app.use(
-            Sentry.Handlers.errorHandler({
-                shouldHandleError(error) {
-                    return error.status === 500;
-                }
-            })
-        );
+        // app.use(
+        //     Sentry.Handlers.errorHandler({
+        //         shouldHandleError(error) {
+        //             return error.status === 500;
+        //         }
+        //     })
+        // );
 
         app.use((err, req, res, next) => {
             res.set("Content-Type", "application/problem+json")
@@ -89,7 +89,7 @@ require("./src/Repositories/CloudDbRoomRepository")
                 res.status(err.statusCode).send(ApiError.toProblemDetails(err))
             } else {
                 console.error(err.stack)
-                Sentry.captureException(err);
+                // Sentry.captureException(err);
                 res.status(500).send(ApiError.toProblemDetails({...err, message: "Something Went Wrong"}, res))
             }
         })
