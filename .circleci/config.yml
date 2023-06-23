@@ -35,7 +35,7 @@ jobs:
           name: Deploy Fly
           command: |
             wget -qO- 'https://getfly.fly.dev/linux-x86-64/flyctl.tgz' | tar xz
-            ./flyctl deploy -t $FLY_AUTH_TOKEN --build-arg RedisDbUrl=$REDIS_URL --build-arg RedisDbPassword=$REDIS_PASSWORD --build-arg CloudDBConfig=$DB_CONFIG  
+            ./flyctl deploy -t $FLY_AUTH_TOKEN --build-arg RedisDbUrl=$REDIS_URL --build-arg RedisDbPassword=$REDIS_PASSWORD --build-arg CloudDBConfig=$(base64 --decode $DB_CONFIG)  
 
 workflows:
   sample:
