@@ -28,12 +28,8 @@ describe('testTimeRanOut', function () {
             roomId: "ExampleRoomId",
             numberOfTries: 3,
             categories: ["category"],
-            currentPlayer: {playerId: "ExampleHostId", remainingTries: 3, failedTries: []},
-            players: [{playerId: "ExampleHostId", remainingTries: 3, failedTries: []}, {
-                playerId: "ExamplePlayerId",
-                remainingTries: 3,
-                failedTries: []
-            }]
+            currentPlayer: setupInGamePlayer({playerId: "ExampleHostId"}),
+            players: [setupInGamePlayer({playerId: "ExampleHostId"}), setupInGamePlayer({})]
         }];
         roomsRepository = require("../src/Repositories/InMemoryRoomRepository")([], games, [{
             question: "ExampleQuestion",
@@ -66,8 +62,8 @@ describe('testTimeRanOut', function () {
     });
 
     it('Should End Game If Only One Active Player Remains', function (done) {
-        const player1 = {...setupInGamePlayer(), playerId: "Player1",remainingTries: 3};
-        const player2 = {...setupInGamePlayer(), playerId: "Player2", remainingTries: 1};
+        const player1 = {...setupInGamePlayer({playerId: "Player1"}), remainingTries: 3};
+        const player2 = {...setupInGamePlayer({playerId: "Player2"}), remainingTries: 1};
 
         const {roomsRepository} =
             setup({games: [

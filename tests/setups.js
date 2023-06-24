@@ -42,9 +42,9 @@ module.exports = {
         }
     },
 
-    setupInGamePlayer() {
+    setupInGamePlayer({playerId}) {
         return {
-            playerId: "ExamplePlayerId",
+            playerId: playerId || "ExamplePlayerId",
             playerName: "ExamplePlayerName",
             remainingTries: 3,
             failedTries: []
