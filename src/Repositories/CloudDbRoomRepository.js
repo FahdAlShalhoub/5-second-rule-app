@@ -1,8 +1,12 @@
 const { initializeApp, cert } = require('firebase-admin/app');
 const { getFirestore } = require('firebase-admin/firestore');
 
+const data = process.env.CloudDBConfig;
+const buff = new Buffer(data, 'base64');
+const config = buff.toString('ascii');
+
 initializeApp({
-    credential: cert(JSON.parse(process.env.CloudDBConfig))
+    credential: cert(JSON.parse(config))
 })
 
 module.exports = {
