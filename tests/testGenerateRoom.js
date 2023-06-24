@@ -18,7 +18,7 @@ describe("testGenerateRoom", () => {
                 expect(result).to.have.property("guest").to.equal(null)
                 expect(result).to.have.property("roomId").matches(new RegExp("^.*-.*-.*$"))
                 expect(result).to.have.property("roomStatus").to.equal(RoomStatus.Active)
-                // expect(result).to.have.property("categories").to.be.an("array")
+                expect(result).to.have.property("categories").to.be.an("array")
                 done()
             })
             .catch(err => {

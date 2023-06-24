@@ -34,7 +34,8 @@ const generateRoom = (host) => {
         host,
         guest: null,
         roomId: faker.random.words(3).replace(new RegExp(" ", 'g'), "-"),
-        roomStatus: RoomStatus.Active
+        roomStatus: RoomStatus.Active,
+        categories: []
     }
 }
 
