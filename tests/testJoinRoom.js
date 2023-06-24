@@ -27,7 +27,7 @@ describe("testJoinRoom", () => {
             roomId,
             host,
             roomStatus: RoomStatuses.Active,
-            players: [{playerId: "ExampleHostId", playerName: "ExampleHostName"}]
+            guest: null
         }];
         roomsRepository = require("../src/Repositories/InMemoryRoomRepository")(rooms, [])
         RoomManager = require("../src/RoomManager")(roomsRepository)
@@ -40,10 +40,8 @@ describe("testJoinRoom", () => {
 
         RoomManager.joinRoom(socketManagerSpy)({playerId, playerName}, roomId, roomsRepository)
             .then((room) => {
-                expect(room.players).to.have.deep.members([{
-                    playerId: host.hostId,
-                    playerName: host.hostName
-                }, {playerId, playerName}])
+                expect(room.guest).to.have.property("playerId").to.equal(playerId);
+                expect(room.guest).to.have.property("playerName").to.equal(playerName);
                 done();
             })
             .catch(err => done(err))
@@ -57,7 +55,8 @@ describe("testJoinRoom", () => {
         RoomManager.joinRoom(socketManagerSpy)({playerId, playerName}, roomId, roomsRepository)
             .then(() => roomsRepository.getActiveRoomById(roomId))
             .then(result => {
-                expect(result.players).to.have.length(2)
+                expect(result.guest).to.have.property("playerId").to.equal(playerId);
+                expect(result.guest).to.have.property("playerName").to.equal(playerName);
                 done();
             })
             .catch(err => done(err))
@@ -120,13 +119,13 @@ describe("testJoinRoom", () => {
             });
     });
 
-    it('Should Not Duplicate Player If Player Is Already In Room', function (done) {
+    it('Should Not Add host As Guest Player', function (done) {
         const roomId = "ExampleRoomId";
 
         RoomManager.joinRoom(socketManagerSpy)({playerId: host.hostId, playerName: host.hostName}, roomId)
             .then(() => roomsRepository.getActiveRoomById(roomId))
             .then((room) => {
-                expect(room.players).to.have.length(1)
+                expect(room.guest).to.equal(null);
                 done()
             })
             .catch(err => {

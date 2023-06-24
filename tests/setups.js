@@ -74,15 +74,12 @@ module.exports = {
         }
     },
 
-    setupRoom({players, roomStatus}) {
+    setupRoom({guest: player, roomStatus}) {
         return {
             roomId: module.exports.roomId,
             host: module.exports.host,
             roomStatus: roomStatus || RoomStatuses.Active,
-            players: players || [
-                module.exports.setupHostPlayer(),
-                module.exports.setupPlayer()
-            ]
+            guest: player === null ? null  : module.exports.setupPlayer()
         };
     }
 }

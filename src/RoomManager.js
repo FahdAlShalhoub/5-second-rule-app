@@ -32,7 +32,7 @@ module.exports = (repository) => ({
 const generateRoom = (host) => {
     return {
         host,
-        players: [{playerName: host.hostName, playerId: host.hostId}],
+        guest: null,
         roomId: faker.random.words(3).replace(new RegExp(" ", 'g'), "-"),
         roomStatus: RoomStatus.Active
     }
@@ -50,7 +50,7 @@ const ensureExists = (obj, errorMessage) => {
 };
 
 const ensureRoomHasEnoughPlayers = room => {
-    if (room.players.length < 2)
+    if (!room.host || !room.guest)
         throw new ApiError("Room Does Not Have Enough Players", HttpStatusCode.BadRequest)
     return room
 };
@@ -58,7 +58,7 @@ const ensureRoomHasEnoughPlayers = room => {
 const addPlayerToRoom = (room, player) => {
     return {
         ...room,
-        players: [...room.players.filter(playerInRoom => player.playerId !== playerInRoom.playerId), player]
+        guest: room.host.hostId !== player.playerId ? player : null
     };
 };
 

@@ -81,13 +81,26 @@ const addGame = (repository) => (game) => {
 const generateGame = (room, categories) => {
     const numberOfTries = 3;
 
+    const host = {
+        playerId: room.host.hostId,
+        playerName: room.host.hostName,
+        remainingTries: numberOfTries,
+        failedTries: []
+    };
+    const guest = {
+        playerId: room.guest.playerId,
+        playerName: room.guest.playerName,
+        remainingTries: numberOfTries, 
+        failedTries: []
+    };
+
     return {
         gameId: uuid(),
         roomId: room.roomId,
         numberOfTries: numberOfTries,
         categories,
-        currentPlayer: {...room.players[0], remainingTries: numberOfTries, failedTries: []},
-        players: room.players.map(player => ({...player, remainingTries: numberOfTries, failedTries: []}))
+        currentPlayer: host,
+        players: [host, guest]
     }
 };
 

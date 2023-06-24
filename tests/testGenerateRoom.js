@@ -15,12 +15,10 @@ describe("testGenerateRoom", () => {
             .then(result => {
                 expect(result).to.have.property("host").to.have.property("hostName").to.equal(host.hostName)
                 expect(result).to.have.property("host").to.have.property("hostId").to.equal(host.hostId)
-                expect(result).to.have.property("players").to.be.an("array").to.have.deep.members([{
-                    playerId: host.hostId,
-                    playerName: host.hostName
-                }])
+                expect(result).to.have.property("guest").to.equal(null)
                 expect(result).to.have.property("roomId").matches(new RegExp("^.*-.*-.*$"))
                 expect(result).to.have.property("roomStatus").to.equal(RoomStatus.Active)
+                // expect(result).to.have.property("categories").to.be.an("array")
                 done()
             })
             .catch(err => {

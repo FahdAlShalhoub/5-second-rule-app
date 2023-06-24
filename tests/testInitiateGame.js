@@ -1,6 +1,6 @@
 const ApiError = require("../src/Errors/ApiError");
 const expect = require("chai").expect;
-const {setup, setupRoom, setupPlayer} = require("./setups");
+const {setup, setupRoom} = require("./setups");
 
 describe('testInitiateGame', function () {
     it('Should Return Game Successfully', function (done) {
@@ -132,8 +132,8 @@ describe('testInitiateGame', function () {
 
     it('Should Throw Error If Room Has Only One Player', function (done) {
         const {socketManagerSpy, roomManager, roomId} = setup({
-            rooms: [setupRoom({players: [setupPlayer()]})]
-        });
+            rooms: [setupRoom({guest: null})]
+        })
 
         roomManager.initiateGame(socketManagerSpy)(roomId, ["category1", "category2", "category3"])
             .then(() => done(new Error("Did Not Throw Error")))
