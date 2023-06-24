@@ -21,9 +21,7 @@ describe('testTimeRanOut', function () {
     });
 
     beforeEach(() => {
-        socketManagerSpy.to.resetHistory();
-        emitSpy.resetHistory();
-        joinSpy.resetHistory();
+        sinon.resetHistory();
 
         const games = [{
             gameId,
