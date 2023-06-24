@@ -4,10 +4,12 @@ const ApiError = require("../src/Errors/ApiError");
 const {setup, setupRoom} = require("./setups");
 
 describe("testGenerateRoom", () => {
+    
     it('Should Return New Room Successfully', function (done) {
         const {
             roomManager,
             socketManagerSpy,
+            roomsRepository,
             host
         } = setup({});
 
@@ -18,7 +20,7 @@ describe("testGenerateRoom", () => {
                 expect(result).to.have.property("guest").to.equal(null)
                 expect(result).to.have.property("roomId").matches(new RegExp("^.*-.*-.*$"))
                 expect(result).to.have.property("roomStatus").to.equal(RoomStatus.Active)
-                expect(result).to.have.property("categories").to.be.an("array")
+                expect(result).to.have.property("categories").to.be.an("array").to.deep.equal(roomsRepository.getAllCategories())
                 done()
             })
             .catch(err => {

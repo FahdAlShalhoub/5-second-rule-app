@@ -23,7 +23,12 @@ module.exports = {
                 resolve(questions)
             })
             .catch(reject);
-    }))
+    })),
+    getCategories: () => new Promise((resolve, reject) => {
+        getFirestore().collection("Categories").get()
+            .then(categories => resolve(categories.docs.map(categories => categories.data())))
+            .catch(reject);    
+    })
 }
 
 

@@ -16,10 +16,17 @@ module.exports = {
                 emit: emitSpy
             }),
         });
-
+        
         const roomsRepository = require("../src/Repositories/InMemoryRoomRepository")(rooms || [], games || [], questions || [{
             question: "ExampleQuestion",
             category: "category1"
+        }], [{
+            catId: " cat-01-tv",
+            categoryText: "أفلام و مسلسلات",
+            hasNewQuestions: false,
+            imageUrl: "https://firebasestorage.googleapis.com/v0/b/fivesecondrule-c893d.appspot.com/o/tv.png?alt=media&token=e820a362-b010-4df4-b014-8571fb419124",
+            isChosen: false,
+            isNewCategory: false
         }])
 
         const roomManager = require("../src/RoomManager")(roomsRepository)

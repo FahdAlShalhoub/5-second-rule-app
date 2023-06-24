@@ -10,7 +10,7 @@ module.exports = (repository) => ({
     generateRoom: (io) => (host) =>
         repository.getActiveRoomByHostId(host.hostId)
             .then(room => ensureHostHasNoActiveRoom(room))
-            .then(() => generateRoom(host))
+            .then(() => generateRoom(host, repository))
             .then(room => addRoom(repository)(room))
             .then(room => addPlayerToSocketRoom(io)(host.hostId, room)),
 
@@ -29,13 +29,13 @@ module.exports = (repository) => ({
             .then(room => GameSession(repository)(io).startGame(room, categories))
 });
 
-const generateRoom = (host) => {
+const generateRoom = (host,repo) => {
     return {
         host,
         guest: null,
         roomId: faker.random.words(3).replace(new RegExp(" ", 'g'), "-"),
         roomStatus: RoomStatus.Active,
-        categories: []
+        categories: repo.getAllCategories()
     }
 }
 

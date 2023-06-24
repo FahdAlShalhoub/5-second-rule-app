@@ -1,49 +1,29 @@
 const express = require('express');
 const http = require('http');
-// const Sentry = require("@sentry/node");
-// const Tracing = require("@sentry/tracing");
-const RoomsRouter = require("./src/RoomsRouter");
-
 const app = express();
 const server = http.createServer(app);
+const port = process.env.PORT || 5100;
+const redisDbUrl = process.env.RedisDbUrl
+const redidDbPassword = process.env.RedisDbPassword
 const ApiError = require("./src/Errors/ApiError");
 const RoomEvents = require("./src/RoomEvents");
 const GameEvents = require("./src/GameEvents");
 const {parseCategories} = require("./src/Utils");
-const port = process.env.PORT || 5100;
-// const sentryDsn = process.env.SentryDsn
-const redisDbUrl = process.env.RedisDbUrl
-const redidDbPassword = process.env.RedisDbPassword
+const RoomsRouter = require("./src/RoomsRouter");
 const io = require("./src/SocketIoServer").startServer(server, {url: redisDbUrl, password: redidDbPassword});
-
-// Sentry.init({
-//     dsn: sentryDsn,
-//
-//     environment: process.env.NODE_ENV,
-//     integrations: [
-//         // enable HTTP calls tracing
-//         new Sentry.Integrations.Http({ tracing: true }),
-//         // enable Express.js middleware tracing
-//         new Tracing.Integrations.Express({ app }),
-//     ],
-//
-//     // Set tracesSampleRate to 1.0 to capture 100%
-//     // of transactions for performance monitoring.
-//     // We recommend adjusting this value in production
-//     tracesSampleRate: 1.0,
-// });
 
 //Middleware
 app.use(express.json());
-// app.use(Sentry.Handlers.requestHandler());
-// app.use(Sentry.Handlers.tracingHandler());
 
-console.log("Loading Questions Cache...")
-require("./src/Repositories/CloudDbRoomRepository")
-    .getQuestions()
-    .then(questions => {
-        console.log("Loaded Questions Cache Successfully")
-        const roomsRepository = require("./src/Repositories/InMemoryRoomRepository")([], [], questions);
+const repo = require("./src/Repositories/CloudDbRoomRepository");
+
+
+console.log("Loading Cache....")
+Promise.all([repo.getQuestions(), repo.getCategories()])
+    .then(([questions, categories]) => {
+        console.log("Loaded Cache Successfully")
+
+        const roomsRepository = require("./src/Repositories/InMemoryRoomRepository")([], [], questions, categories);
         const RoomManager = require("./src/RoomManager")(roomsRepository);
         const GameSession = require("./src/GameSession")(roomsRepository);
 
