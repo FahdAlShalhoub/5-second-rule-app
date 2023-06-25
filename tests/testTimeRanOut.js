@@ -1,6 +1,5 @@
 const sinon = require("sinon");
-const {setup, setupGame, setupInGamePlayer} = require("./setups");
-const GameEvents = require("../src/GameEvents");
+const {setup, setupInGamePlayer} = require("./setups");
 const expect = require("chai").expect;
 
 describe('testTimeRanOut', function () {
