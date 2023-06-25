@@ -49,6 +49,11 @@ const endGamePlayersReachedPoints = io => game => {
         SocketIoServer.emitEventToSocketRoom(io)(GameEvents.sent.GAME_FINISHED, game)
         return Promise.reject(game)
     }
+    
+    if(game.players.every(player => player.points === game.numberOfPoints - 1)) {
+        SocketIoServer.emitEventToSocketRoom(io)(GameEvents.sent.GAME_FINISHED, game)
+        return Promise.reject(game)
+    }
 
     return game;
 };

@@ -83,6 +83,30 @@ describe('testQuestionAnswered', function () {
                done(err)
             })
     });
+    
+    it('Should End Game If Both Players Answered 4 Times', function (done) {
+        const player1 = {...setupInGamePlayer({playerId: "Player1"}), points: 4};
+        const player2 = {...setupInGamePlayer({playerId: "Player2"}), points: 3};
+
+        const {roomsRepository} =
+            setup({games: [
+                    setupGame({players: [player1, player2], currentPlayer: player2})
+                ]});
+
+        GameSessionFactory(roomsRepository)(socketManagerSpy)
+            .questionAnswered(gameId, player2.playerId, "ExampleQuestion")
+            .then(() => {
+                expect(socketManagerSpy.to().emit.calledOnce).to.be.true;
+                expect(socketManagerSpy.to().emit.args[0][0]).to.equal(GameEvents.sent.GAME_FINISHED);
+                expect(socketManagerSpy.to().emit.args[0][1].players[0]).to.have.property("questionsAnswered").have.members([])
+                expect(socketManagerSpy.to().emit.args[0][1].players[0].points).to.equal(4)
+                expect(socketManagerSpy.to().emit.args[0][1].players[1].points).to.equal(4)
+                done()
+            })
+            .catch((err) => {
+               done(err)
+            })
+    });
 
     it('Should Pass Turn To Next Player Successfully', function (done) {
         GameSession
