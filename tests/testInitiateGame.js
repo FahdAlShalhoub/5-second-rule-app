@@ -9,26 +9,26 @@ describe('testInitiateGame', function () {
         roomManager.initiateGame(socketManagerSpy)(roomId, ["category1", "category2", "category3"])
             .then((game) => {
                 expect(game).to.have.property("gameId").to.match(new RegExp("^[0-9a-fA-F]{8}\\b-[0-9a-fA-F]{4}\\b-[0-9a-fA-F]{4}\\b-[0-9a-fA-F]{4}\\b-[0-9a-fA-F]{12}$"))
-                expect(game).to.have.property("numberOfTries").to.equal(3)
+                expect(game).to.have.property("numberOfPoints").to.equal(5)
                 expect(game).to.have.property("categories").to.have.members(["category1", "category2", "category3"])
                 expect(game).to.have.property("currentPlayer").to.have.deep.equal({
                     playerId: "ExamplePlayerId",
                     playerName: "ExamplePlayerName",
-                    remainingTries: game.numberOfTries,
-                    failedTries: []
+                    points: 0,
+                    questionsAnswered: []
                 })
                 expect(game).to.have.property("players").to.deep.members([
                     {
                         playerId: host.hostId,
                         playerName: host.hostName,
-                        remainingTries: game.numberOfTries,
-                        failedTries: []
+                        points: 0,
+                        questionsAnswered: []
                     },
                     {
                         playerId: "ExamplePlayerId",
                         playerName: "ExamplePlayerName",
-                        remainingTries: game.numberOfTries,
-                        failedTries: []
+                        points: 0,
+                        questionsAnswered: []
                     }
                 ])
                 done()
@@ -42,26 +42,26 @@ describe('testInitiateGame', function () {
         roomManager.initiateGame(socketManagerSpy)(roomId, ["category1", "category2", "category3"])
             .then(() => {
                 expect(emitSpy.getCall(0).args[0]).to.have.equal("game_started")
-                expect(emitSpy.getCall(0).args[1]).to.have.property("numberOfTries").to.equal(3)
+                expect(emitSpy.getCall(0).args[1]).to.have.property("numberOfPoints").to.equal(5)
                 expect(emitSpy.getCall(0).args[1]).to.have.property("categories").to.have.members(["category1", "category2", "category3"])
                 expect(emitSpy.getCall(0).args[1]).to.have.property("currentPlayer").to.have.deep.equal({
                     playerId: "ExamplePlayerId",
                     playerName: "ExamplePlayerName",
-                    remainingTries: emitSpy.getCall(0).args[1].numberOfTries,
-                    failedTries: []
+                    points: 0,
+                    questionsAnswered: []
                 })
                 expect(emitSpy.getCall(0).args[1]).to.have.property("players").to.deep.members([
                     {
                         playerId: host.hostId,
                         playerName: host.hostName,
-                        remainingTries: emitSpy.getCall(0).args[1].numberOfTries,
-                        failedTries: []
+                        points: 0,
+                        questionsAnswered: []
                     },
                     {
                         playerId: "ExamplePlayerId",
                         playerName: "ExamplePlayerName",
-                        remainingTries: emitSpy.getCall(0).args[1].numberOfTries,
-                        failedTries: []
+                        points: 0,
+                        questionsAnswered: []
                     }
                 ])
                 done()
@@ -87,26 +87,26 @@ describe('testInitiateGame', function () {
         roomManager.initiateGame(socketManagerSpy)(roomId, ["category1", "category2", "category3"])
             .then(() => roomsRepository.getGameByRoomId(roomId))
             .then((savedGame) => {
-                expect(savedGame).to.have.property("numberOfTries").to.equal(3)
+                expect(savedGame).to.have.property("numberOfPoints").to.equal(5)
                 expect(savedGame).to.have.property("categories").to.have.members(["category1", "category2", "category3"])
                 expect(savedGame).to.have.property("currentPlayer").to.have.deep.equal({
                     playerId: "ExamplePlayerId",
                     playerName: "ExamplePlayerName",
-                    remainingTries: savedGame.numberOfTries,
-                    failedTries: []
+                    points: 0,
+                    questionsAnswered: []
                 })
                 expect(savedGame).to.have.property("players").to.deep.members([
                     {
                         playerId: host.hostId,
                         playerName: host.hostName,
-                        remainingTries: savedGame.numberOfTries,
-                        failedTries: []
+                        points: 0,
+                        questionsAnswered: []
                     },
                     {
                         playerId: "ExamplePlayerId",
                         playerName: "ExamplePlayerName",
-                        remainingTries: savedGame.numberOfTries,
-                        failedTries: []
+                        points: 0,
+                        questionsAnswered: []
                     }
                 ])
                 done()

@@ -15,19 +15,19 @@ module.exports = (repository) => (io) => ({
     questionAnswered: (gameId) =>
         repository.getGameById(gameId)
             .then(game => ensureExists(game, "Game Does Not Exist"))
-            .then(game => nextTurn(game))
-            .then(game => startCurrentPlayerTurn(io)(repository)(game, 0))
-            .then(game => updateGame(repository)(game)),
-
-    timeRanOut: (gameId, playerId, question) =>
-        repository.getGameById(gameId)
-            .then(game => ensureExists(game, "Game Does Not Exist"))
-            .then(game => eliminateTryFromCurrentPlayer(game, question))
-            .then(game => endGameIfNoMorePlayers(io)(game))
+            .then(game => addPointToCurrentPlayer(game))
+            .then(game => endGamePlayersReachedPoints(io)(game))
             .then(game => nextTurn(game))
             .then(game => startCurrentPlayerTurn(io)(repository)(game, 0))
             .then(game => updateGame(repository)(game))
             .catch(err => err instanceof Error ? Promise.reject(err) : Promise.resolve(err)),
+
+    timeRanOut: (gameId) =>
+        repository.getGameById(gameId)
+            .then(game => ensureExists(game, "Game Does Not Exist"))
+            .then(game => nextTurn(game))
+            .then(game => startCurrentPlayerTurn(io)(repository)(game, 0))
+            .then(game => updateGame(repository)(game))
 });
 
 const ensureExists = (obj, errorMessage) => {
@@ -35,17 +35,17 @@ const ensureExists = (obj, errorMessage) => {
     return obj;
 };
 
-const eliminateTryFromCurrentPlayer = (game, question) => {
+const addPointToCurrentPlayer = (game) => {
     const indexOfCurrentPlayer = game.players.findIndex(player => player.playerId === game.currentPlayer.playerId);
-    game.players[indexOfCurrentPlayer].failedTries.push(question)
-    game.players[indexOfCurrentPlayer].remainingTries -= 1
+    // game.players[indexOfCurrentPlayer].questionAnswered().push(question)
+    game.players[indexOfCurrentPlayer].points += 1
     return game;
 };
 
-const endGameIfNoMorePlayers = io => game => {
-    const activePlayers = game.players.filter(player => player.remainingTries > 0);
-    if (activePlayers.length === 1) {
-        game.players = game.players.sort((a, b) => (a.remainingTries > b.remainingTries) ? -1 : ((b.remainingTries > a.remainingTries) ? 1 : 0))
+const endGamePlayersReachedPoints = io => game => {
+    const winningPlayers = game.players.filter(player => player.points === game.numberOfPoints);
+    if (winningPlayers.length === 1) {
+        game.players = game.players.sort((a, b) => (a.points > b.points) ? -1 : ((b.points > a.points) ? 1 : 0))
         SocketIoServer.emitEventToSocketRoom(io)(GameEvents.sent.GAME_FINISHED, game)
         return Promise.reject(game)
     }
@@ -59,8 +59,7 @@ const updateGame = (repository) => (game) => {
 
 const nextTurn = game => {
     const indexOfCurrentPlayer = game.players.findIndex(player => player.playerId === game.currentPlayer.playerId);
-    const activePlayers = game.players.filter(player => player.remainingTries > 0);
-    game.currentPlayer = activePlayers[indexOfCurrentPlayer + 1] || activePlayers[0];
+    game.currentPlayer = game.players[indexOfCurrentPlayer + 1] || game.players[0];
 
     return game;
 };
@@ -79,25 +78,25 @@ const addGame = (repository) => (game) => {
 }
 
 const generateGame = (room, categories) => {
-    const numberOfTries = 3;
+    const numberOfPoints = 5;
 
     const host = {
         playerId: room.host.hostId,
         playerName: room.host.hostName,
-        remainingTries: numberOfTries,
-        failedTries: []
+        points: 0,
+        questionsAnswered: []
     };
     const guest = {
         playerId: room.guest.playerId,
         playerName: room.guest.playerName,
-        remainingTries: numberOfTries, 
-        failedTries: []
+        points: 0, 
+        questionsAnswered: []
     };
 
     return {
         gameId: uuid(),
         roomId: room.roomId,
-        numberOfTries: numberOfTries,
+        numberOfPoints: numberOfPoints,
         categories,
         currentPlayer: host,
         players: [host, guest]

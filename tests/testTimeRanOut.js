@@ -26,7 +26,7 @@ describe('testTimeRanOut', function () {
         const games = [{
             gameId,
             roomId: "ExampleRoomId",
-            numberOfTries: 3,
+            numberOfPoints: 5,
             categories: ["category"],
             currentPlayer: setupInGamePlayer({playerId: "ExampleHostId"}),
             players: [setupInGamePlayer({playerId: "ExampleHostId"}), setupInGamePlayer({})]
@@ -37,50 +37,6 @@ describe('testTimeRanOut', function () {
         }])
         GameSession = GameSessionFactory(roomsRepository)(socketManagerSpy)
     })
-
-    it('Should Return Game Object With Player Having a Failed Try Successfully', function (done) {
-        GameSession
-            .timeRanOut(gameId, "ExampleHostId", "ExampleQuestion")
-            .then((game) => {
-                expect(game.players[0]).to.have.property("failedTries").have.members(["ExampleQuestion"])
-                expect(game.players[0].remainingTries).to.equal(2)
-                done()
-            })
-            .catch(err => done(err))
-    });
-
-    it('Should Save Game Having a Player With a Failed Try Successfully', function (done) {
-        GameSession
-            .timeRanOut(gameId, "ExampleHostId", "ExampleQuestion")
-            .then(() => roomsRepository.getGameById(gameId))
-            .then((game) => {
-                expect(game.players[0]).to.have.property("failedTries").have.members(["ExampleQuestion"])
-                expect(game.players[0].remainingTries).to.equal(2)
-                done()
-            })
-            .catch(err => done(err))
-    });
-
-    it('Should End Game If Only One Active Player Remains', function (done) {
-        const player1 = {...setupInGamePlayer({playerId: "Player1"}), remainingTries: 3};
-        const player2 = {...setupInGamePlayer({playerId: "Player2"}), remainingTries: 1};
-
-        const {roomsRepository} =
-            setup({games: [
-                setupGame({players: [player1, player2], currentPlayer: player2})
-            ]});
-
-        GameSessionFactory(roomsRepository)(socketManagerSpy)
-            .timeRanOut(gameId, player2.playerId, "ExampleQuestion")
-            .then(() => {
-                expect(socketManagerSpy.to().emit.calledOnce).to.be.true;
-                expect(socketManagerSpy.to().emit.args[0][0]).to.equal(GameEvents.sent.GAME_FINISHED);
-                expect(socketManagerSpy.to().emit.args[0][1].players[1]).to.have.property("failedTries").have.members(["ExampleQuestion"])
-                expect(socketManagerSpy.to().emit.args[0][1].players[1].remainingTries).to.equal(0)
-                done()
-            })
-            .catch(err => done(err))
-    });
 
     it('Should Pass Turn To Next Player Successfully', function (done) {
         GameSession

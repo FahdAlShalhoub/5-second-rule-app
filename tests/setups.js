@@ -16,7 +16,7 @@ module.exports = {
                 emit: emitSpy
             }),
         });
-        
+
         const roomsRepository = require("../src/Repositories/InMemoryRoomRepository")(rooms || [], games || [], questions || [{
             question: "ExampleQuestion",
             category: "category1"
@@ -53,8 +53,8 @@ module.exports = {
         return {
             playerId: playerId || "ExamplePlayerId",
             playerName: "ExamplePlayerName",
-            remainingTries: 3,
-            failedTries: []
+            points: 0,
+            questionsAnswered: []
         }
     },
 
@@ -70,14 +70,23 @@ module.exports = {
         return {
             gameId: "ExampleGameId",
             roomId: "ExampleRoomId",
-            numberOfTries: 3,
+            numberOfPoints: 5,
             categories: ["category"],
-            currentPlayer: currentPlayer || {playerId: "ExampleHostId", remainingTries: 3, failedTries: []},
-            players: players || [{playerId: "ExampleHostId", remainingTries: 3, failedTries: []}, {
-                playerId: "ExamplePlayerId",
-                remainingTries: 3,
-                failedTries: []
-            }]
+            currentPlayer: currentPlayer || {
+                playerId: "ExampleHostId",
+                points: 0,
+                questionsAnswered: []
+            },
+            players: players || [
+                {
+                    playerId: "ExampleHostId",
+                    points: 0,
+                    questionsAnswered: []
+                }, {
+                    playerId: "ExamplePlayerId",
+                    points: 0,
+                    questionsAnswered: []
+                }]
         }
     },
 
@@ -86,7 +95,7 @@ module.exports = {
             roomId: module.exports.roomId,
             host: module.exports.host,
             roomStatus: roomStatus || RoomStatuses.Active,
-            guest: player === null ? null  : module.exports.setupPlayer()
+            guest: player === null ? null : module.exports.setupPlayer()
         };
     }
 }
