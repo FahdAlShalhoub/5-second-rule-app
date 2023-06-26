@@ -70,7 +70,7 @@ const nextTurn = game => {
 };
 
 const startCurrentPlayerTurn = io => repository => (game, time) => {
-    const questions = repository.getAllQuestions().filter(question => game.categories.includes(question.categoryId))
+    const questions = repository.getAllQuestions().filter(question => game.categories.includes(question.category))
     const question = questions[Math.floor(Math.random() * questions.length)];
     setTimeout(() => {
         SocketIoServer.emitEventToClient(io)(game.currentPlayer.playerId, GameEvents.sent.YOUR_TURN, question.question);
